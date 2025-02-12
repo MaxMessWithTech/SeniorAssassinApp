@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>U-High Senior Assassin | Home</title>
+
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+
+        <style>
+            .gradient-custom {
+                /* fallback for old browsers */
+                background: #6a11cb;
+                
+                /* Chrome 10-25, Safari 5.1-6 */
+                background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+                
+                /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+                background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
+            };
+        </style>
+    </head>
+    <body style="background: black;">
+        <section class="gradient-custom">
+            <div class="container py-5">
+              <div class="row d-flex justify-content-center align-items-center" style="min-height: 100vh">
+                <div class="col-20 col-md-16 col-lg-10 col-xl-8">
+                  <div class="card bg-dark" style="border-radius: 1rem; height: 90%">
+                    <div class="card-body p-5 text-center">
+                        <div class="accordion" id="accordionExample">
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Round Stats
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        <p style="margin-bottom: 1rem"><strong>Current Round:</strong>              {{current_round_index}} </p>
+                                        <p style="margin-bottom: 1rem"><strong>Eliminated This Round:</strong>      {{eliminated_this_round}} </p>
+                                        <p style="margin-bottom: 1rem"><strong>Eliminated Permanently:</strong>     {{eliminated_permanently}} </p>
+                                        <p style="margin-bottom: 1rem"><strong>Remaining:</strong>                  {{remaining}} </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        Create Round and pairings
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        <form action="{% url 'assignments:assign-teams' %}" method="post">
+                                            {% csrf_token %}
+                
+                                            <fieldset>
+                                                <div class="form-outline form-white mb-4">
+                                                    Round Number
+                                                    <input type="int" name="round_num" id="round_num" class="form-control form-control-lg" />
+                                                </div>
+                                            </fieldset>
+                                            <fieldset>
+                                                <div class="form-outline form-white mb-4">
+                                                    Start Date
+                                                    <input type="date" name="start_date" id="start_date" class="form-control form-control-lg" />
+                                                </div>
+                                            </fieldset>
+                                            <fieldset>
+                                                <div class="form-outline form-white mb-4">
+                                                    End Date
+                                                    <input type="date" name="end_date" id="end_date" class="form-control form-control-lg" />
+                                                </div>
+                                            </fieldset>
+                
+                                            <input 
+                                                data-mdb-button-init 
+                                                data-mdb-ripple-init 
+                                                class="btn btn-outline-light btn-lg px-5" 
+                                                type="submit"
+                                                value="Create"
+                                            />
+                
+                                            {% if error_message %}
+                                            <div class="alert alert-primary alert-dismissible alert-fixed" role="alert" style="pos">
+                                                <div>{{ error_message }}</div>
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                            {% endif %}
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseTwo">
+                                        Eliminate Participant
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        <form action="{% url 'assignments:assign-teams' %}" method="post">
+                                            {% csrf_token %}
+                
+                                            <fieldset>
+                                                <div class="form-outline form-white mb-4">
+                                                    Round Number
+                                                    <input type="int" name="round_num" id="round_num" class="form-control form-control-lg" />
+                                                </div>
+                                            </fieldset>
+                                            <fieldset>
+                                                <div class="form-outline form-white mb-4">
+                                                    Start Date
+                                                    <input type="date" name="start_date" id="start_date" class="form-control form-control-lg" />
+                                                </div>
+                                            </fieldset>
+                                            <fieldset>
+                                                <div class="form-outline form-white mb-4">
+                                                    End Date
+                                                    <input type="date" name="end_date" id="end_date" class="form-control form-control-lg" />
+                                                </div>
+                                            </fieldset>
+                
+                                            <input 
+                                                data-mdb-button-init 
+                                                data-mdb-ripple-init 
+                                                class="btn btn-outline-light btn-lg px-5" 
+                                                type="submit"
+                                                value="Create"
+                                            />
+                
+                                            {% if error_message %}
+                                            <div class="alert alert-primary alert-dismissible alert-fixed" role="alert" style="pos">
+                                                <div>{{ error_message }}</div>
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                            {% endif %}
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

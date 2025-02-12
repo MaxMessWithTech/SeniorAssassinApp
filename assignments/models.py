@@ -4,6 +4,7 @@ import string
 
 
 class Team(models.Model):
+    id = models.IntegerField(default=0, primary_key=True)
     name = models.CharField(max_length=200)
     eliminated = models.BooleanField(default=False)
 
@@ -13,7 +14,7 @@ class Team(models.Model):
     viewing_code = models.CharField(max_length=8, default=generate_viewing_code, unique=True)
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.id}-{self.name}"
 
 
 class Participant(models.Model):
