@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-7dowc%bbo@b9mw)(5cwu5&u6os81j727*2g#2x1y&ewg5ibw3w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["senior-assassin-9fd1c8975ad5.herokuapp.com"]
+ALLOWED_HOSTS = ["senior-assassin-9fd1c8975ad5.herokuapp.com", "127.0.0.1"]
 
 
 # Application definition
@@ -80,12 +81,16 @@ WSGI_APPLICATION = 'SeniorAssassinApp.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+"""
+DATABASES = {
+    'default': dj_database_url.config(default='sqlite:///db.sqlite3', conn_max_age=600)
 }
 
 
@@ -114,6 +119,7 @@ STORAGES = {
     },
 }
 
+WHITENOISE_USE_FINDERS = True
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
@@ -122,7 +128,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'CST'
 
 USE_I18N = True
 
