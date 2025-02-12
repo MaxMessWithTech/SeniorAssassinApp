@@ -114,6 +114,8 @@ STORAGES = {
     },
 }
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
