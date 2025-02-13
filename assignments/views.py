@@ -18,7 +18,6 @@ import random
 def getCurRound() -> Round:
 	rounds = Round.objects.all()
 
-	current_round = None
 	for round in rounds: 
 		if round.start_date <= timezone.now() and round.end_date > timezone.now():
 			return round
@@ -170,7 +169,8 @@ def adminControl(request):
 		round_elims = Participant.objects.filter(round_eliminated=True, eliminated_permanently=False)
 		perm_elims = Participant.objects.filter(eliminated_permanently=True)
 		remaining = Participant.objects.filter(round_eliminated=False, eliminated_permanently=False)
-	except:
+	except Exception as e:
+		print(e)
 		current_round = None
 		current_round_index = -1
 
