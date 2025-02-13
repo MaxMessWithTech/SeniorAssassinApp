@@ -174,9 +174,9 @@ def adminControl(request):
 		current_round = None
 		current_round_index = -1
 
-		round_elims = 0
-		perm_elims = 0
-		remaining = 0
+		round_elims = []
+		perm_elims = []
+		remaining = []
 	
 	template = loader.get_template("assignments/adminControl.html")
 	context = {
