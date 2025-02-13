@@ -163,12 +163,20 @@ class ParticipantAutocomplete(autocomplete.Select2QuerySetView):
 
 @login_required
 def adminControl(request):
-	current_round = getCurRound()
-	current_round_index = current_round.index
+	try:
+		current_round = getCurRound()
+		current_round_index = current_round.index
 
-	round_elims = Participant.objects.filter(round_eliminated=True, eliminated_permanently=False)
-	perm_elims = Participant.objects.filter(eliminated_permanently=True)
-	remaining = Participant.objects.filter(round_eliminated=False, eliminated_permanently=False)
+		round_elims = Participant.objects.filter(round_eliminated=True, eliminated_permanently=False)
+		perm_elims = Participant.objects.filter(eliminated_permanently=True)
+		remaining = Participant.objects.filter(round_eliminated=False, eliminated_permanently=False)
+	except:
+		current_round = None
+		current_round_index = -1
+
+		round_elims = 0
+		perm_elims = 0
+		remaining = 0
 	
 	template = loader.get_template("assignments/adminControl.html")
 	context = {
