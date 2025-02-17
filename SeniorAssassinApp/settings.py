@@ -32,10 +32,9 @@ ALLOWED_HOSTS = ["senior-assassin-9fd1c8975ad5.herokuapp.com", "127.0.0.1"]
 # Application definition
 
 INSTALLED_APPS = [
-    'assignments.apps.AssignmentsConfig',
-
     'dal',
     'dal_select2',
+    'assignments.apps.AssignmentsConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',

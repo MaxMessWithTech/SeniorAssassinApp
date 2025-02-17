@@ -20,4 +20,5 @@ from django.urls import include, path
 urlpatterns = [
     path("", include("assignments.urls")),
     path("admin/", admin.site.urls),
+    # path(r'^chaining/', include('smart_selects.urls')),
 ]

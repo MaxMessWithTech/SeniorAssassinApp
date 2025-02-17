@@ -1,6 +1,8 @@
 from django.db import models
 import random
 import string
+import django
+from smart_selects.db_fields import ChainedForeignKey
 
 
 class Team(models.Model):
@@ -51,6 +53,30 @@ class Target(models.Model):
     eliminations = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"Round {self.round.index} target of {self.target_team.name} by {self.prosecuting_team.name}"
+        return f"Round {self.round.index} target of {self.target_team} by {self.prosecuting_team.name}"
 
 
+class Kill(models.Model):
+    target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='target', null=True)
+    
+    elimed_participant = models.ForeignKey(Participant, on_delete=models.CASCADE,  related_name='elimed_participant',  null=True)
+    eliminator = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='eliminator', null=True)
+
+    date = models.DateField(default=django.utils.timezone.now)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # This code only happens if the objects is
+            # not in the database yet. Otherwise it would a have pk
+            
+            self.target.eliminations += 1
+            self.target.save()
+
+            self.elimed_participant.round_eliminated = True
+            self.elimed_participant.save()
+
+
+        super(Kill, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.elimed_participant.name} killed by {self.eliminator.name} on {self.date.strftime('%A, %B %d')}"

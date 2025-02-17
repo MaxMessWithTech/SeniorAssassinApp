@@ -102,34 +102,68 @@
                                 </h2>
                                 <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                                     <div class="accordion-body">
-                                        <form action="{% url 'assignments:assign-teams' %}" method="post">
+                                        <form action="{% url 'assignments:eliminate-participant' %}" method="post">
                                             {% csrf_token %}
                 
                                             <fieldset>
                                                 <div class="form-outline form-white mb-4">
-                                                    Round Number
-                                                    <input type="int" name="round_num" id="round_num" class="form-control form-control-lg" />
+                                                    Target
+                                                    <select 
+                                                        class="form-select" 
+                                                        aria-label="Default select example"
+                                                        name="target_id" 
+                                                        id="target_id"
+                                                        onChange="updateParticipantsOnChange"
+                                                    >
+                                                        <option value="0" selected></option>
+                                                        {% for target in round_targets %}
+                                                            <option value="{{target.pk}}">{{ target }}</option>
+                                                        {% endfor %}
+                                                    </select>
                                                 </div>
                                             </fieldset>
+
                                             <fieldset>
                                                 <div class="form-outline form-white mb-4">
-                                                    Start Date
-                                                    <input type="date" name="start_date" id="start_date" class="form-control form-control-lg" />
+                                                    Eliminated Participant
+                                                    <select 
+                                                        class="form-select" 
+                                                        aria-label="Default select example"
+                                                        name="elimed_participant_id" 
+                                                        id="elimed_participant_id"
+                                                    >
+
+                                                    </select>
                                                 </div>
                                             </fieldset>
+
                                             <fieldset>
                                                 <div class="form-outline form-white mb-4">
-                                                    End Date
-                                                    <input type="date" name="end_date" id="end_date" class="form-control form-control-lg" />
+                                                    Eliminator
+                                                    <select 
+                                                        class="form-select" 
+                                                        aria-label="Default select example"
+                                                        name="eliminator_id" 
+                                                        id="eliminator_id"
+                                                    >
+
+                                                    </select>
+                                                </div>
+                                            </fieldset>
+
+                                            <fieldset>
+                                                <div class="form-outline form-white mb-4">
+                                                    Date
+                                                    <input type="date" name="date" id="date" class="form-control form-control-lg" />
                                                 </div>
                                             </fieldset>
                 
                                             <input 
                                                 data-mdb-button-init 
                                                 data-mdb-ripple-init 
-                                                class="btn btn-outline-light btn-lg px-5" 
+                                                class="btn btn-outline-danger btn-lg px-5" 
                                                 type="submit"
-                                                value="Create"
+                                                value="Kill"
                                             />
                 
                                             {% if error_message %}
@@ -149,4 +183,67 @@
             </div>
         </section>
     </body>
+
+    {{ all_teams|json_script:"all_teams" }}
+    {{ participants|json_script:"participants" }}
+    {{ round_targets_ser|json_script:"round_targets_ser" }}
+    
+    <script>
+        const all_teams = JSON.parse(document.getElementById('all_teams').textContent);
+        const participants = JSON.parse(document.getElementById('participants').textContent);
+        const round_targets = JSON.parse(document.getElementById('round_targets_ser').textContent);
+
+        let updateParticipantsOnChange = (event) => {
+            console.log(event)
+            console.log(all_teams);
+            console.log(participants);
+            console.log(round_targets);
+
+            let elimArray = [];
+            let killerArray = [];
+            let target = {};
+
+            // Get Target Object
+            for (let i = 0; i < round_targets.length; i++) {
+                if (round_targets[i].id === parseInt(event.target.value)) {
+                    target = round_targets[i];
+                    break;
+                }
+            }
+
+            for (let i = 0; i < all_teams.length; i++) {
+                let team = all_teams[i];
+
+                if (team.id === target.target_team) {
+                    for (let j = 0; j < participants.length; j++) {
+                        let participant = participants[j];
+                        if (participant.team === team.id) {
+                            elimArray.push(
+                                '<option id="' + participant.id + '" value="' + participant.id + '">' + participant.name + '</option>'
+                            )
+                        }
+                    }
+                }
+
+                else if (team.id === target.prosecuting_team) {
+                    for (let j = 0; j < participants.length; j++) {
+                        
+                        let participant = participants[j];
+                        if (participant.team === team.id) {
+                            killerArray.push(
+                                '<option id="' + participant.id + '" value="' + participant.id + '">' + participant.name + '</option>'
+                            )
+                        }
+                    }
+                }
+            }
+
+            console.log(elimArray);
+
+            document.querySelector('#elimed_participant_id').innerHTML = elimArray.join("");
+            document.querySelector('#eliminator_id').innerHTML = killerArray.join("");
+        }
+
+        document.querySelector("#target_id").addEventListener("change", (event) => updateParticipantsOnChange(event));
+    </script>
 </html>

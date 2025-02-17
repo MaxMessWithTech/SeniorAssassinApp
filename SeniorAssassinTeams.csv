@@ -1,31 +1,31 @@
-ID,Name,1,2,3,4,5,Total Amount Paid,Fully Paid,Method
-1,Wet Dreams,Cole Matejka,Martin Donahue,AJ Holden,Charlie Karun,Landon Hinkle,,FALSE,
-2,The Spruzz,Deegan Aeilts,Max Wille,Will Paxson,Braden Deverman,Gabe Zacharias,,FALSE,
-3,Stream Snipers,Keaton Ash,Chase Boester,Will Blum,Demir Spaulding,Jack Eovaldi,,FALSE,
-4,Karsplasians,Reagan Bull,Faith Tomman,Avery Kirk,Garyn Negale,Aubry Blake,,FALSE,
-5,The Super Squirt Sisters,Kinley Mitchell,Levyn Snow,Molly Jones,Ella Schirano,,,FALSE,
-6,Drip Drop Divas,Karolina Carpenter,Allie Hougas,Jalia Robinson,Kaitlyn Ringler,,,FALSE,
-7,Drip too Hard,Ethan Kieser,Connor Macmillan,Braden Mehn,Alek Weiland,,,FALSE,
-8,Squirt Alert,Annika Armstrong,emma eovaldi,Method,poppy henry,mayaih russell,$30.00,TRUE,Venmo
-9,Dirty squirters,Tessa Rolley,Lux Nsindu,Yuwen Jin,Sofia Welborn,Isabella McKinney,$30.00,TRUE,Venmo
-10,Keeping up with the Karsplashians,Ava Frazier,Benedicta Johnson,Lydia Wilcox,Eesha Yadav,Joshitha Bodavula,$30.00,TRUE,Cash
-11,walkemdownandsquirtem,Owen Pacetti,Sailesh Sasikumar,Robert Null II,Noah Molitor,Noah Greishaber,,FALSE,
-12,,Ashley Nalley,Mario Watson,Shawn Immanuel,Hal Kinsella,,$7.50,FALSE,Venmo
-13,Soggy Soldiers,Grant Jain,Lucas Hurd,Mason Dunn,Aiden Dozier,Josh Caraballo,$30.00,TRUE,Venmo
-14,Bed Wetters,Jack Muehleck,Josh Butler,Parker Chaplin,Trent Minor,,,FALSE,
-15,,,,,,,,,
-16,,,,,,,,,
-17,,,,,,,,,
-18,,,,,,,,,
-19,,,,,,,,,
-20,,,,,,,,,
-21,,,,,,,,,
-22,,,,,,,,,
-23,,,,,,,,,
-24,,,,,,,,,
-25,,,,,,,,,
-26,,,,,,,,,
-27,,,,,,,,,
-28,,,,,,,,,
-29,,,,,,,,,
-30,,,,,,,,,
+ID,Name,1,2,3,4,5,Total Amount Paid,Fully Paid,Method,Sent Photos
+1,Wet Dreams,Cole Matejka,Martin Donahue,AJ Holden,Charlie Karun,Landon Hinkle,,FALSE,,FALSE
+2,The Spruzz,Deegan Aeilts,Max Wille,Will Paxson,Braden Deverman,Gabe Zacharias,,FALSE,,TRUE
+3,Stream Snipers,Keaton Ash,Chase Boester,Will Blum,Demir Spaulding,Jack Eovaldi,,FALSE,,FALSE
+4,Karsplasians,Reagan Bull,Faith Tomman,Avery Kirk,Garyn Negale,Aubry Blake,,FALSE,,FALSE
+5,The Super Squirt Sisters,Kinley Mitchell,Levyn Snow,Molly Jones,Ella Schirano,,,FALSE,,FALSE
+6,Drip Drop Divas,Karolina Carpenter,Allie Hougas,Jalia Robinson,Kaitlyn Ringler,,,FALSE,,FALSE
+7,Drip too Hard,Ethan Kieser,Connor Macmillan,Braden Mehn,Alek Weiland,,,FALSE,,FALSE
+8,Squirt Alert,Annika Armstrong,emma eovaldi,Method,poppy henry,mayaih russell,$30.00,TRUE,Venmo,FALSE
+9,Dirty squirters,Tessa Rolley,Lux Nsindu,Yuwen Jin,Sofia Welborn,Isabella McKinney,$30.00,TRUE,Venmo,FALSE
+10,Keeping up with the Karsplashians,Ava Frazier,Benedicta Johnson,Lydia Wilcox,Eesha Yadav,Joshitha Bodavula,$30.00,TRUE,Cash,FALSE
+11,walkemdownandsquirtem,Owen Pacetti,Sailesh Sasikumar,Robert Null II,Noah Molitor,Noah Greishaber,,FALSE,,FALSE
+12,,Ashley Nalley,Mario Watson,Shawn Immanuel,Hal Kinsella,,$7.50,FALSE,Venmo,FALSE
+13,Soggy Soldiers,Grant Jain,Lucas Hurd,Mason Dunn,Aiden Dozier,Josh Caraballo,$30.00,TRUE,Venmo,TRUE
+14,Bed Wetters,Jack Muehleck,Josh Butler,Parker Chaplin,Trent Minor,,,FALSE,,FALSE
+15,Squirt Team 6,Zach Gunther,Austen Babineaux,Drew Rader,Clay Nord,,$7.00,FALSE,Cash,FALSE
+16,,Daken Davenport,Joseph Elkins,Jackson Fleming,Hiram Guedman,Thomas Raycraft,$30.00,TRUE,Venmo,FALSE
+17,,,,,,,,FALSE,,FALSE
+18,,,,,,,,FALSE,,FALSE
+19,,,,,,,,FALSE,,FALSE
+20,,,,,,,,FALSE,,FALSE
+21,,,,,,,,FALSE,,FALSE
+22,,,,,,,,FALSE,,FALSE
+23,,,,,,,,FALSE,,FALSE
+24,,,,,,,,FALSE,,FALSE
+25,,,,,,,,FALSE,,FALSE
+26,,,,,,,,FALSE,,FALSE
+27,,,,,,,,FALSE,,FALSE
+28,,,,,,,,FALSE,,FALSE
+29,,,,,,,,FALSE,,FALSE
+30,,,,,,,,,,

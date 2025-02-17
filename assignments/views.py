@@ -6,8 +6,10 @@ from django.urls import reverse
 from django.utils import timezone
 import datetime
 from django.db.models import Q
+from django.forms.models import model_to_dict
+import assignments.forms
 
-from assignments.models import Team, Participant, Round, Target
+from assignments.models import Team, Participant, Round, Target, Kill
 
 import csv
 import assignments.handleCSV as handleCSV
@@ -23,6 +25,18 @@ def getCurRound() -> Round:
 			return round
 
 	return None
+
+
+def convertQueryToNameList(query) -> list:
+	out = list()
+
+	for p in query:
+		out.append(p.name)
+
+	if len(out) == 0:
+		out.append("NONE")
+	
+	return out
 
 
 def index(request):
@@ -76,30 +90,62 @@ def home(request, team_code):
 
 		cur_target = cur_round_targets[0]
 
-		target_participant_objs = Participant.objects.filter(team=cur_target.target_team)
-		
-		target_participants = list()
+		# Get target participants
+		target_participant_objs = Participant.objects.filter(team=cur_target.target_team).filter(eliminated_permanently=False)
+		target_participants = convertQueryToNameList(target_participant_objs)
 
-		for p in target_participant_objs:
-			target_participants.append(p.name)
+		# Get Eliminated Targets
+		eliminated_targets = target_participant_objs.filter(round_eliminated=True)
+		elimed_targets = convertQueryToNameList(eliminated_targets)
 
-		# Remaining Team Members
+
+		# Get Remaining Team Members
 		remainingMembersObjs = Participant.objects.filter(team=team).filter(round_eliminated=False).filter(eliminated_permanently=False)
+		remainingMembers = convertQueryToNameList(remainingMembersObjs)
+
+		# Get Round Elimed Team Members
+		roundElimedMembersObjs = Participant.objects.filter(team=team).filter(round_eliminated=True).filter(eliminated_permanently=False)
+		roundElimedTeam = convertQueryToNameList(roundElimedMembersObjs)
+
+		# Get Perm Elimed Team Members
+		permElimedObjs = Participant.objects.filter(team=team).filter(eliminated_permanently=True)
+		permElimedTeam = convertQueryToNameList(permElimedObjs)
+
 		
-		remainingMembers = list()
-		for p in remainingMembersObjs:
-			remainingMembers.append(p.name)
+
+		notifications = list()
+
+		kills = Kill.objects.filter(target=cur_target)
+		
+		for kill in kills:
+			notifications.append(str(kill))
+		
 
 		template = loader.get_template("assignments/home.html")
 		context = {
 			'team_code': team.viewing_code,
 			'team_name': team.name,
 			'current_round_index': current_round_index,
-			'target_participants': ','.join(target_participants),
+			'cur_round_start': current_round.start_date,
+			'cur_round_end': current_round.end_date,
+			'target_participants': ', '.join(target_participants),
+			'elimed_targets':  ', '.join(elimed_targets),
 			'target_name': cur_target.target_team.name,
-			'remaining_members': ','.join(remainingMembers)
+			'notifications': notifications,
+			'remaining_members': ', '.join(remainingMembers),
+			'roundElimedTeam': ', '.join(roundElimedTeam),
+			'permElimedTeam': ', '.join(permElimedTeam),
+			'cur_target':cur_target
+
 		}
 		return HttpResponse(template.render(context, request))
+
+def reportKill(request, team_code):
+	template = loader.get_template("assignments/home.html")
+	context = {
+		'team_code': team_code,
+	}
+	return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -178,14 +224,97 @@ def adminControl(request):
 		perm_elims = []
 		remaining = []
 	
+	round_targets = Target.objects.filter(round=getCurRound())
+	round_target_list = list()
+	for target in round_targets:
+		round_target_list.append(model_to_dict(target))
+
+
+	all_teams = Team.objects.all()
+	team_list = list()
+	for team in all_teams:
+		team_list.append(model_to_dict(team))
+
+	participants = Participant.objects.all()
+	participant_list = list()
+	for participant in participants:
+		participant_list.append(model_to_dict(participant))
+
 	template = loader.get_template("assignments/adminControl.html")
 	context = {
 		'current_round_index': current_round_index,
 		'eliminated_this_round': len(round_elims),
 		'eliminated_permanently': len(perm_elims),
-		'remaining': len(remaining)
+		'remaining': len(remaining),
+		'round_targets': round_targets,
+		'round_targets_ser': round_target_list,
+		'all_teams': team_list,
+		'participants': participant_list
 	}
 	return HttpResponse(template.render(context, request))
+
+
+@login_required
+def eliminateParticipant(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest("Must be a POST request!")
+	
+	"""
+	POST PARAMS
+	target_id, elimed_participant_id, eliminator_id, date
+	"""
+	
+	if "target_id" not in request.POST:
+		return HttpResponseBadRequest("missing target ID param!")
+	if "elimed_participant_id" not in request.POST:
+		return HttpResponseBadRequest("missing elimed_participant ID param!")
+	if "eliminator_id" not in request.POST:
+		return HttpResponseBadRequest("missing eliminator ID param!")
+	
+	target = get_object_or_404(Target, id=int(request.POST["target_id"]))
+
+	elimed_participant = get_object_or_404(
+		Participant, id=int(request.POST["elimed_participant_id"])
+	)
+
+	eliminator = get_object_or_404(
+		Participant, id=int(request.POST["eliminator_id"])
+	)
+	
+	kill = Kill(
+		target = target,
+		elimed_participant = elimed_participant,
+		eliminator = eliminator,
+		date = datetime.datetime.fromisoformat(request.POST["date"])
+	)
+
+	kill.save()
+	
+	elimed_participant.round_eliminated = True
+	elimed_participant.save()
+
+	return HttpResponseRedirect(reverse("assignments:admin-control"))
+
+
+class ParticipantAutocomplete(autocomplete.Select2QuerySetView):
+	def get_queryset(self):
+		if not self.request.user.is_authenticated:
+			return Participant.objects.none()
+		qs = Participant.objects.all()
+		if self.q:
+			qs = qs.filter(name__istartswith=self.q) # Adjust filter as needed
+		return qs
+	
+
+class TargetAutocomplete(autocomplete.Select2QuerySetView):
+	def get_queryset(self):
+		if not self.request.user.is_authenticated:
+			return Target.objects.none()
+		qs = Target.objects.all()
+		if self.q:
+			qs = qs.filter(name__istartswith=self.q) # Adjust filter as needed
+		return qs
+
 
 
 @login_required

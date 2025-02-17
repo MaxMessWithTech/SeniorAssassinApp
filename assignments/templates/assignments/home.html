@@ -16,30 +16,97 @@
                 background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
                 
                 /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-                background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
-                }
+                background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+
+                min-height: 100vh;
+            }
+
+            .notification-btn {
+              position: fixed;
+              right: 1rem;
+              top: 1rem;
+              width:4rem;
+              height:4rem;
+            }
         </style>
     </head>
-    <body>
-        <section class="vh-100 gradient-custom">
+    <body style="background:black;">
+        <section class="h-100 gradient-custom">
             <div class="container py-5 h-100">
               <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-20 col-md-16 col-lg-10 col-xl-8">
                   <div class="card bg-dark text-white" style="border-radius: 1rem;">
                     <div class="card-body p-5 text-center">
-          
                       <div class="mb-md-5 mt-md-4 pb-5">
           
-                        <h2 class="fw-bold mb-2 text-uppercase">Welcome</h2>
-                        <p class="text-white-50" style="margin-bottom: 3rem">{{team_name}}</p>
+                        <h2 class="fw-bold mb-2 text-uppercase text-lg-left">Welcome</h2>
+                        <p class="text-white-50" style="margin-bottom: 3rem">Team: {{team_name}}</p>
 
-                        <p style="margin-bottom: 1rem"><strong>Current Round:</strong>              {{current_round_index}} </p>
-                        <p style="margin-bottom: 1rem"><strong>Current Pairing:</strong>            {{target_name}}         </p>
-                        <p style="margin-bottom: 1rem"><strong>Target Members:</strong>             {{target_participants}} </p>
-                        <p style="margin-bottom: 1rem"><strong>Team Members Remaining:</strong>     {{remaining_members}}   </p>
-                        <p style="margin-bottom: 1rem"><strong>Eliminated This Round:</strong>                              </p>
-                        <p style="margin-bottom: 1rem"><strong>Eliminated Permanently:</strong>                             </p>
+
+                        <ul class="list-group">
+                          <li class="list-group-item active">
+                            <h3>Round {{current_round_index}}</h3>
+                          </li>
+
+                          <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                            <div class="fw-bold">Current Target Team</div>
+                            {{target_name}}
+                          </li>
+
+                          <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                            <div class="fw-bold">Target Team Members</div>
+                            {{target_participants}}
+                          </li>
+
+                          <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                            <div class="fw-bold">Eliminated</div>
+                            {{elimed_targets}}
+                          </li>
+
+                          <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                            <div class="fw-bold">Start Time</div>
+                            {{cur_round_start}}
+                          </li>
+
+                          <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                            <div class="fw-bold">End Time</div>
+                            {{cur_round_end}}
+                          </li>
+
+                          <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                            <div class="fw-bold">Report Kill</div>
+                            <div>Text Max Miller at <a href="tel:309-838-0387">(309) 838 - 0387</a></div> 
+                            <div>Rules: 90sec or less video, name of killer and killed, & date and time.</div>
+                            <a 
+                              href="https://docs.google.com/document/d/1qEHMJE0k_nPxqG3r9DeC21Z7fMQ8gj2TGtrpO3vqQAM/edit?tab=t.0#heading=h.gzygfdg0xz78" 
+                              target="_blank"
+                            >See rules</a>
+                          </li>
+                        </ul>
                         
+                        </br>
+
+                        <ul class="list-group">
+                          <li class="list-group-item active">
+                            <h3>Team Status</h3>
+                          </li>
+
+                          <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                            <div class="fw-bold">Team Members Remaining</div>
+                            {{remaining_members}}
+                          </li>
+
+                          <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                            <div class="fw-bold">Eliminated This Round</div>
+                            {{roundElimedTeam}}
+                          </li>
+
+                          <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                            <div class="fw-bold">Eliminated Permanently</div>
+                            {{permElimedTeam}}
+                          </li>
+
+                        </ul>
                         
                     </div>
                   </div>
@@ -47,6 +114,31 @@
               </div>
             </div>
           </section>
+          
+          <button 
+            class="btn btn-danger btn-lg notification-btn" 
+            href="#offcanvasExample"
+            type="button" 
+            data-bs-toggle="offcanvas" 
+            data-bs-target="#offcanvasExample" 
+            aria-controls="offcanvasExample"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+              <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
+            </svg>
+          </button>
 
-    </body>
+          <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasExampleLabel">Notifications</h5>
+              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              {% for i in notifications %}
+                {{ i }}<br>
+              {% endfor %}
+            </div>
+          </div>
+   
+        </body>
 </html>
