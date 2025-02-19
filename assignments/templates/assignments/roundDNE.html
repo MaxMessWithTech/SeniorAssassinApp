@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>U-High Senior Assassin | Round DNE</title>
+
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+
+        <style>
+            .gradient-custom {
+                /* fallback for old browsers */
+                background: #6a11cb;
+                
+                /* Chrome 10-25, Safari 5.1-6 */
+                background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+                
+                /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+                background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+
+                min-height: 100vh;
+            }
+
+            .notification-btn {
+              position: fixed;
+              right: 1rem;
+              top: 1rem;
+              width:4rem;
+              height:4rem;
+            }
+        </style>
+    </head>
+    <body style="background:black;">
+        <section class="h-100 gradient-custom">
+            <div class="container py-5 h-100">
+              <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-20 col-md-16 col-lg-10 col-xl-8">
+                  <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                    <div class="card-body p-5 text-center">
+                      <div class="mb-md-5 mt-md-4 pb-5">
+
+                        <h3>No Current Round</h3>
+                        <span>Please Wait until the game begins , then you will see your team information.</span>
+                        <br/>
+                        <span>See the <a href="https://docs.google.com/document/d/1qEHMJE0k_nPxqG3r9DeC21Z7fMQ8gj2TGtrpO3vqQAM/edit?tab=t.0">RULES</a> for more info</span>
+                        
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+   
+        </body>
+</html>

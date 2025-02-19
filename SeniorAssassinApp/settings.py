@@ -62,7 +62,7 @@ ROOT_URLCONF = 'SeniorAssassinApp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['assignments'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

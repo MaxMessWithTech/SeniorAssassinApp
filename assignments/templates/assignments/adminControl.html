@@ -6,6 +6,8 @@
         {% load bootstrap5 %}
         {% bootstrap_css %}
         {% bootstrap_javascript %}
+        {% load math_filters %}
+        {% load target_filters %}
 
         <style>
             .gradient-custom {
@@ -22,165 +24,196 @@
     </head>
     <body style="background: black;">
         <section class="gradient-custom">
-            <div class="container py-5">
-              <div class="row d-flex justify-content-center align-items-center" style="min-height: 100vh">
-                <div class="col-20 col-md-16 col-lg-10 col-xl-8">
-                  <div class="card bg-dark" style="border-radius: 1rem; height: 90%">
-                    <div class="card-body p-5 text-center">
-                        <div class="accordion" id="accordionExample">
+        <div class="container py-5">
+        <div class="row d-flex justify-content-center align-items-center" style="min-height: 100vh">
+        <div class="col-20 col-md-16 col-lg-10 col-xl-8">
+        <div class="card bg-dark" style="border-radius: 1rem; height: 90%">
+        <div class="card-body p-5 text-center">
+            <div class="accordion" id="accordionExample">
 
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        Round Stats
-                                    </button>
-                                </h2>
-                                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                                    <div class="accordion-body">
-                                        <p style="margin-bottom: 1rem"><strong>Current Round:</strong>              {{current_round_index}} </p>
-                                        <p style="margin-bottom: 1rem"><strong>Eliminated This Round:</strong>      {{eliminated_this_round}} </p>
-                                        <p style="margin-bottom: 1rem"><strong>Eliminated Permanently:</strong>     {{eliminated_permanently}} </p>
-                                        <p style="margin-bottom: 1rem"><strong>Remaining:</strong>                  {{remaining}} </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        Create Round and pairings
-                                    </button>
-                                </h2>
-                                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                    <div class="accordion-body">
-                                        <form action="{% url 'assignments:assign-teams' %}" method="post">
-                                            {% csrf_token %}
-                
-                                            <fieldset>
-                                                <div class="form-outline form-white mb-4">
-                                                    Round Number
-                                                    <input type="int" name="round_num" id="round_num" class="form-control form-control-lg" />
-                                                </div>
-                                            </fieldset>
-                                            <fieldset>
-                                                <div class="form-outline form-white mb-4">
-                                                    Start Date
-                                                    <input type="date" name="start_date" id="start_date" class="form-control form-control-lg" />
-                                                </div>
-                                            </fieldset>
-                                            <fieldset>
-                                                <div class="form-outline form-white mb-4">
-                                                    End Date
-                                                    <input type="date" name="end_date" id="end_date" class="form-control form-control-lg" />
-                                                </div>
-                                            </fieldset>
-                
-                                            <input 
-                                                data-mdb-button-init 
-                                                data-mdb-ripple-init 
-                                                class="btn btn-outline-light btn-lg px-5" 
-                                                type="submit"
-                                                value="Create"
-                                            />
-                
-                                            {% if error_message %}
-                                            <div class="alert alert-primary alert-dismissible alert-fixed" role="alert" style="pos">
-                                                <div>{{ error_message }}</div>
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                            </div>
-                                            {% endif %}
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseTwo">
-                                        Eliminate Participant
-                                    </button>
-                                </h2>
-                                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                    <div class="accordion-body">
-                                        <form action="{% url 'assignments:eliminate-participant' %}" method="post">
-                                            {% csrf_token %}
-                
-                                            <fieldset>
-                                                <div class="form-outline form-white mb-4">
-                                                    Target
-                                                    <select 
-                                                        class="form-select" 
-                                                        aria-label="Default select example"
-                                                        name="target_id" 
-                                                        id="target_id"
-                                                        onChange="updateParticipantsOnChange"
-                                                    >
-                                                        <option value="0" selected></option>
-                                                        {% for target in round_targets %}
-                                                            <option value="{{target.pk}}">{{ target }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-                                            </fieldset>
-
-                                            <fieldset>
-                                                <div class="form-outline form-white mb-4">
-                                                    Eliminated Participant
-                                                    <select 
-                                                        class="form-select" 
-                                                        aria-label="Default select example"
-                                                        name="elimed_participant_id" 
-                                                        id="elimed_participant_id"
-                                                    >
-
-                                                    </select>
-                                                </div>
-                                            </fieldset>
-
-                                            <fieldset>
-                                                <div class="form-outline form-white mb-4">
-                                                    Eliminator
-                                                    <select 
-                                                        class="form-select" 
-                                                        aria-label="Default select example"
-                                                        name="eliminator_id" 
-                                                        id="eliminator_id"
-                                                    >
-
-                                                    </select>
-                                                </div>
-                                            </fieldset>
-
-                                            <fieldset>
-                                                <div class="form-outline form-white mb-4">
-                                                    Date
-                                                    <input type="date" name="date" id="date" class="form-control form-control-lg" />
-                                                </div>
-                                            </fieldset>
-                
-                                            <input 
-                                                data-mdb-button-init 
-                                                data-mdb-ripple-init 
-                                                class="btn btn-outline-danger btn-lg px-5" 
-                                                type="submit"
-                                                value="Kill"
-                                            />
-                
-                                            {% if error_message %}
-                                            <div class="alert alert-primary alert-dismissible alert-fixed" role="alert" style="pos">
-                                                <div>{{ error_message }}</div>
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                            </div>
-                                            {% endif %}
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
+                <!-- Round Stats -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Round Stats
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <p style="margin-bottom: 1rem"><strong>Current Round:</strong>              {{current_round_index}} </p>
+                            <p style="margin-bottom: 1rem"><strong>Eliminated This Round:</strong>      {{eliminated_this_round}} </p>
+                            <p style="margin-bottom: 1rem"><strong>Eliminated Permanently:</strong>     {{eliminated_permanently}} </p>
+                            <p style="margin-bottom: 1rem"><strong>Remaining:</strong>                  {{remaining}} </p>
                         </div>
                     </div>
                 </div>
+
+                <!-- Create Round and pairings -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Create Round and pairings
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <form action="{% url 'assignments:assign-teams' %}" method="post">
+                                {% csrf_token %}
+    
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        Round Number
+                                        <input type="int" name="round_num" id="round_num" class="form-control form-control-lg" />
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        Start Date
+                                        <input type="date" name="start_date" id="start_date" class="form-control form-control-lg" />
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        End Date
+                                        <input type="date" name="end_date" id="end_date" class="form-control form-control-lg" />
+                                    </div>
+                                </fieldset>
+    
+                                <input 
+                                    data-mdb-button-init 
+                                    data-mdb-ripple-init 
+                                    class="btn btn-outline-primary btn-lg px-5" 
+                                    type="submit"
+                                    value="Create"
+                                />
+    
+                                {% if error_message %}
+                                <div class="alert alert-primary alert-dismissible alert-fixed" role="alert" style="pos">
+                                    <div>{{ error_message }}</div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Pairings for Round -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseTwo">
+                            View Current Pairings for Round {{current_round_index}}
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <ul class="list-group">
+                                <!-- Loop through all targets in this round -->
+                                {% for target in round_targets %}
+                                
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto text-start">
+                                      <div class="fw-bold">Target: {{target.target_team.name}}</div>
+                                      Attacker: {{target.prosecuting_team.name}}
+                                    </div>
+                                    <span class="badge bg-danger rounded-pill">{{target.target_team.get_perm_elimed_count}}</span>
+                                    <span class="badge bg-warning text-dark rounded-pill">{{target.target_team.get_round_elimed_count}}</span>
+                                    <span class="badge bg-success rounded-pill">{{target.target_team.get_remaining_count}}</span>
+                                  </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Eliminate Participant -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseTwo">
+                            Eliminate Participant
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <form action="{% url 'assignments:eliminate-participant' %}" method="post">
+                                {% csrf_token %}
+    
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        Target
+                                        <select 
+                                            class="form-select" 
+                                            aria-label="Default select example"
+                                            name="target_id" 
+                                            id="target_id"
+                                            onChange="updateParticipantsOnChange"
+                                        >
+                                            <option value="0" selected></option>
+                                            {% for target in round_targets %}
+                                                <option value="{{target.pk}}">{{ target }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        Eliminated Participant
+                                        <select 
+                                            class="form-select" 
+                                            aria-label="Default select example"
+                                            name="elimed_participant_id" 
+                                            id="elimed_participant_id"
+                                        >
+
+                                        </select>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        Eliminator
+                                        <select 
+                                            class="form-select" 
+                                            aria-label="Default select example"
+                                            name="eliminator_id" 
+                                            id="eliminator_id"
+                                        >
+
+                                        </select>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        Date
+                                        <input type="date" name="date" id="date" class="form-control form-control-lg" />
+                                    </div>
+                                </fieldset>
+    
+                                <input 
+                                    data-mdb-button-init 
+                                    data-mdb-ripple-init 
+                                    class="btn btn-outline-danger btn-lg px-5" 
+                                    type="submit"
+                                    value="Kill"
+                                />
+    
+                                {% if error_message %}
+                                <div class="alert alert-primary alert-dismissible alert-fixed" role="alert" style="pos">
+                                    <div>{{ error_message }}</div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+        </div>
+        </div>
+        </div>
         </section>
     </body>
 

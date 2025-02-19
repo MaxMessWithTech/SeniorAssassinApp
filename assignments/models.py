@@ -12,6 +12,40 @@ class Team(models.Model):
 
     def generate_viewing_code() -> str:
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    
+    def get_round_elimed(self):
+        print(self.participants.all())
+        filtered_p = list()
+        for p in self.participants.all():
+            if p.round_eliminated is True and p.eliminated_permanently is False:
+                filtered_p.append(p)
+        
+        return filtered_p
+    
+    def get_round_elimed_count(self):
+        return len(self.get_round_elimed())
+    
+    def get_perm_elimed(self):
+        filtered_p = list()
+        for p in self.participants.all():
+            if p.eliminated_permanently is True:
+                filtered_p.append(p)
+        
+        return filtered_p
+    
+    def get_perm_elimed_count(self):
+        return len(self.get_perm_elimed())
+    
+    def get_remaining(self):
+        filtered_p = list()
+        for p in self.participants.all():
+            if p.round_eliminated is False and p.eliminated_permanently is False:
+                filtered_p.append(p)
+        
+        return filtered_p
+    
+    def get_remaining_count(self):
+        return len(self.get_remaining())
 
     viewing_code = models.CharField(max_length=8, default=generate_viewing_code, unique=True)
 
@@ -21,7 +55,7 @@ class Team(models.Model):
 
 class Participant(models.Model):
     name = models.CharField(max_length=200)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="participants")
 
     # A participant can be eliminated in a round and then revived 
     # if their team eliminates 3 people on the team they're matched against
@@ -46,9 +80,9 @@ class Round(models.Model):
 
 
 class Target(models.Model):
-    round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name='match_round')
-    target_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='target_team')
-    prosecuting_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='prosecuting_team')
+    round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name='targets')
+    target_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='targets')
+    prosecuting_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='prosecuting_targets')
     
     eliminations = models.IntegerField(default=0)
 
@@ -59,8 +93,8 @@ class Target(models.Model):
 class Kill(models.Model):
     target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='target', null=True)
     
-    elimed_participant = models.ForeignKey(Participant, on_delete=models.CASCADE,  related_name='elimed_participant',  null=True)
-    eliminator = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='eliminator', null=True)
+    elimed_participant = models.ForeignKey(Participant, on_delete=models.CASCADE,  related_name='eliminations',  null=True)
+    eliminator = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='kills', null=True)
 
     date = models.DateField(default=django.utils.timezone.now)
 

@@ -23,7 +23,6 @@ def getCurRound() -> Round:
 	for round in rounds: 
 		if round.start_date <= timezone.now() and round.end_date > timezone.now():
 			return round
-
 	return None
 
 
@@ -75,13 +74,19 @@ def home(request, team_code):
 	try:
 		team = Team.objects.get(viewing_code=team_code)
 
+		current_round = getCurRound()
+		current_round_index = current_round.index
+
 	except (KeyError, Team.DoesNotExist):
 		# Redisplay the question voting form.
 		return HttpResponseRedirect(reverse("assignments:login"))
 	
+	except (AttributeError):
+		dneTemplate = loader.get_template("assignments/roundDNE.html")
+
+		return HttpResponse(dneTemplate.render({}, request))
+
 	else:
-		current_round = getCurRound()
-		current_round_index = current_round.index
 
 		cur_round_targets = Target.objects.filter(round = current_round).filter(prosecuting_team = team)
 
@@ -174,19 +179,29 @@ def assignTeamsInRound(request):
 	round.save()
 	
 	# Make random assignments
-	teams = Team.objects.all()
+	teams = Team.objects.filter(eliminated=False)
+
+	assignedIDs = list()
 
 	for team in teams:
-		pairedID = random.randint(1, len(teams))
-		targetTeam = Team.objects.filter(id=pairedID).first()
+		while True:
+			pairedID = random.randint(1, len(teams))
+			if pairedID in assignedIDs:
+				continue
 
-		target = Target(
-			round=round, 
-			target_team=targetTeam, 
-			prosecuting_team=team, 
-			eliminations=0
-		)
-		target.save()
+
+			targetTeam = Team.objects.filter(id=pairedID).first()
+
+			target = Target(
+				round=round, 
+				target_team=targetTeam, 
+				prosecuting_team=team, 
+				eliminations=0
+			)
+			target.save()
+
+			assignedIDs.append(pairedID)
+			break
 		
 
 	return HttpResponseRedirect(reverse("assignments:admin-control"))
