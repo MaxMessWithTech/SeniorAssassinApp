@@ -7,6 +7,9 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter = ["id", "name"]
     search_fields = ["id", "name"]
 
+    fields = ["name", "eliminated", "viewing_code"]
+    list_display = ["id", "name", "eliminated", "viewing_code"]
+
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
     list_filter = ["id", "name", "team"]
