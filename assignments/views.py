@@ -229,6 +229,9 @@ class ParticipantAutocomplete(autocomplete.Select2QuerySetView):
 def adminControl(request):
 	try:
 		current_round = getCurRound()
+
+		if current_round is None:
+			current_round = Round.objects.first()
 		current_round_index = current_round.index
 
 		round_elims = Participant.objects.filter(round_eliminated=True, eliminated_permanently=False)
