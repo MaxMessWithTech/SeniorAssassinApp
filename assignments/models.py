@@ -75,6 +75,9 @@ class Round(models.Model):
     start_date = models.DateTimeField("Date Round Starts")
     end_date = models.DateTimeField("Date Round Ends")
 
+    def get_start_date_str(self):
+        return self.start_date.strftime("%m/%d")
+
     def __str__(self):
         return f"Round {self.index}"
 

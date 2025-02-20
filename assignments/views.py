@@ -84,7 +84,9 @@ def home(request, team_code):
 	except (AttributeError):
 		dneTemplate = loader.get_template("assignments/roundDNE.html")
 
-		return HttpResponse(dneTemplate.render({}, request))
+		nextRound = Round.objects.all().order_by('start_date').first()
+
+		return HttpResponse(dneTemplate.render({'nextRound': nextRound}, request))
 
 	else:
 
@@ -125,6 +127,7 @@ def home(request, team_code):
 		for kill in kills:
 			notifications.append(str(kill))
 		
+		nextRound = Round.objects.query(index=current_round_index+1).first()
 
 		template = loader.get_template("assignments/home.html")
 		context = {
@@ -133,6 +136,7 @@ def home(request, team_code):
 			'current_round_index': current_round_index,
 			'cur_round_start': current_round.start_date,
 			'cur_round_end': current_round.end_date,
+			'nextRound': nextRound,
 			'target_participants': ', '.join(target_participants),
 			'elimed_targets':  ', '.join(elimed_targets),
 			'target_name': cur_target.target_team.name,
@@ -140,7 +144,7 @@ def home(request, team_code):
 			'remaining_members': ', '.join(remainingMembers),
 			'roundElimedTeam': ', '.join(roundElimedTeam),
 			'permElimedTeam': ', '.join(permElimedTeam),
-			'cur_target':cur_target
+			'cur_target':cur_target,
 
 		}
 		return HttpResponse(template.render(context, request))
