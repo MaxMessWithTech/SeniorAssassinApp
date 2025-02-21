@@ -377,8 +377,9 @@ def addThings(request):
 						parts.pop(i)
 						break
 				else:
-					newParticipant = Participant(name=name, team=existingTeam)
-					newParticipant.save()
+					if len(name) > 0:
+						newParticipant = Participant(name=name, team=existingTeam)
+						newParticipant.save()
 			
 			# If there are names that shouldn't exist, remove them
 			if len(parts) > 0:
