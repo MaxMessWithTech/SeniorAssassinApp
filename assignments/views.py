@@ -366,15 +366,24 @@ def addThings(request):
 			existingTeam.save()
 			
 			existingParticipants = Participant.objects.filter(team=existingTeam)
+			
+			parts = list()
+			for part in existingParticipants:
+				parts.append(part)
 
 			for name in teammates:
-				for ePart in existingParticipants:
-					if ePart.name == name:
+				for i in range(len(parts)):
+					if parts[i].name == name:
+						parts.pop(i)
 						break
 				else:
 					newParticipant = Participant(name=name, team=existingTeam)
 					newParticipant.save()
-				
+			
+			# If there are names that shouldn't exist, remove them
+			if len(parts) > 0:
+				for part in parts:
+					part.delete()
 
 			continue
 
