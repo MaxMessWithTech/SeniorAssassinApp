@@ -365,7 +365,16 @@ def addThings(request):
 			existingTeam.name = name
 			existingTeam.save()
 			
-			# existingParticipants = Participant.objects.filter(team=existingTeam)
+			existingParticipants = Participant.objects.filter(team=existingTeam)
+
+			for name in teammates:
+				for ePart in existingParticipants:
+					if ePart.name == name:
+						break
+				else:
+					newParticipant = Participant(name=name, team=existingTeam)
+					newParticipant.save()
+				
 
 			continue
 
