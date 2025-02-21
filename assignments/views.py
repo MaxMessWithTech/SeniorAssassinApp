@@ -246,7 +246,7 @@ def adminControl(request):
 		perm_elims = []
 		remaining = []
 	
-	round_targets = Target.objects.filter(round=getCurRound())
+	round_targets = Target.objects.filter(round=current_round)
 	round_target_list = list()
 	for target in round_targets:
 		round_target_list.append(model_to_dict(target))
