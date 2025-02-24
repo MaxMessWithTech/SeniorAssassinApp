@@ -54,7 +54,8 @@ def checkIfTeamValid(id: int, name: str, teammates:list[str]) -> bool:
 		if teammate != "":
 			teammateCount += 1
 
-	if teammateCount < 4 or teammateCount > 5:
+	# DONT ALLOW MORE THAN 5 PEOPLE ON A TEAM
+	if teammateCount > 5:
 		# print(f"(checkIfTeamValid) -> Invalid number of teammates on team with ID of {id}")
 		return False
 	
