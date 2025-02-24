@@ -125,9 +125,12 @@ def home(request, team_code):
 		kills = Kill.objects.filter(target=cur_target)
 		
 		for kill in kills:
-			notifications.append(str(kill))
-		
-		nextRound = Round.objects.query(index=current_round_index+1).first()
+			timedelta = kill.date - timezone.now().date()
+			if timedelta.days <= 7: 
+				notifications.append({
+					"header": "New Kill",
+					"body": f"{kill.eliminator.name} killed {kill.elimed_participant.name} on {kill.date.strftime('%B %d')}"
+				})
 
 		template = loader.get_template("assignments/home.html")
 		context = {
@@ -136,7 +139,6 @@ def home(request, team_code):
 			'current_round_index': current_round_index,
 			'cur_round_start': current_round.start_date,
 			'cur_round_end': current_round.end_date,
-			'nextRound': nextRound,
 			'target_participants': ', '.join(target_participants),
 			'elimed_targets':  ', '.join(elimed_targets),
 			'target_name': cur_target.target_team.name,
@@ -211,20 +213,6 @@ def assignTeamsInRound(request):
 	return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
-class ParticipantAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated:
-            return Participant.objects.none()
-
-        qs = Participant.objects.all()
-
-        if self.q:
-            qs = qs.filter(name__istartswith=self.q)
-
-        return qs
-
-
 @login_required
 def adminControl(request):
 	try:
@@ -264,6 +252,7 @@ def adminControl(request):
 
 	template = loader.get_template("assignments/adminControl.html")
 	context = {
+		'current_round': current_round,
 		'current_round_index': current_round_index,
 		'eliminated_this_round': len(round_elims),
 		'eliminated_permanently': len(perm_elims),
@@ -318,15 +307,61 @@ def eliminateParticipant(request):
 	return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
-class ParticipantAutocomplete(autocomplete.Select2QuerySetView):
-	def get_queryset(self):
-		if not self.request.user.is_authenticated:
-			return Participant.objects.none()
-		qs = Participant.objects.all()
-		if self.q:
-			qs = qs.filter(name__istartswith=self.q) # Adjust filter as needed
-		return qs
+@login_required
+def cleanup_round(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest("Must be a POST request!")
 	
+	# Find the first round that hasn't been marked completed
+	round = Round.objects.filter(completed = False).order_by('start_date').first()
+
+	if round is None:
+		return HttpResponseBadRequest("No rounds that haven't already been completed!")
+	
+	teams = Team.objects.filter(eliminated = False)
+
+	for team in teams:
+		# Get Number of kills that the team has gotten
+		roundProsecutingTarget = team.prosecuting_targets.filter(round=round).first()
+		if roundProsecutingTarget.eliminations >= 2:
+			# Revive all round eliminated team members
+			ps = team.participants.filter(eliminated_permanently=False).filter(round_eliminated=True)
+
+			for p in ps:
+				p.round_eliminated = False
+				p.save()
+		else:
+			# Permanently eliminate all round eliminated team members
+			ps = team.participants.filter(eliminated_permanently=False).filter(round_eliminated=True)
+
+			for p in ps:
+				p.eliminated_permanently = True
+				p.save()
+
+			remaining_members = team.participants.filter(eliminated_permanently=False).filter(round_eliminated=False)
+			if len(remaining_members) == 0:
+				team.eliminated = True
+				team.eliminated_date = timezone.now()
+				team.save()
+
+	round.completed = True
+	round.save()
+	return HttpResponseRedirect(reverse("assignments:admin-control"))
+
+
+class ParticipantAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated:
+            return Participant.objects.none()
+
+        qs = Participant.objects.all()
+
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+
+        return qs
+
 
 class TargetAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):

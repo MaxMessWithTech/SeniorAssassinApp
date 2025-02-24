@@ -11,6 +11,7 @@ urlpatterns = [
     path("add-things", views.addThings, name="add-things"),
     path("assign-teams-in-round", views.assignTeamsInRound, name="assign-teams"),
     path("eliminate-participant", views.eliminateParticipant, name="eliminate-participant"),
+    path("cleanup_round", views.cleanup_round, name="cleanup_round"),
     path("admin-control", views.adminControl, name="admin-control"),
 
     # path("participant-autocomplete/$", views.ParticipantAutocomplete.as_view(), name="participant-autocomplete"),

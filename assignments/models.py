@@ -10,6 +10,8 @@ class Team(models.Model):
     name = models.CharField(max_length=200)
     eliminated = models.BooleanField(default=False)
 
+    eliminated_date=models.DateField(null=True, blank=True)
+
     def generate_viewing_code() -> str:
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
     
@@ -75,6 +77,8 @@ class Round(models.Model):
     start_date = models.DateTimeField("Date Round Starts")
     end_date = models.DateTimeField("Date Round Ends")
 
+    completed = models.BooleanField(default=False)
+
     def get_start_date_str(self):
         return self.start_date.strftime("%m/%d")
 
@@ -90,7 +94,7 @@ class Target(models.Model):
     eliminations = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"Round {self.round.index} target of {self.target_team} by {self.prosecuting_team.name}"
+        return f"Round {self.round.index} target of {self.target_team.name} by {self.prosecuting_team.name}"
 
 
 class Kill(models.Model):

@@ -134,9 +134,14 @@
               <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
-              {% for i in notifications %}
-                {{ i }}<br>
-              {% endfor %}
+              <ul class="list-group">
+                {% for not in notifications %}
+                  <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
+                  <h5>{{ not.header }}</h5>
+                  {{ not.body }}
+                  </li>
+                {% endfor %}
+              </ul>
             </div>
           </div>
    
