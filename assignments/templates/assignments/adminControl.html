@@ -99,7 +99,7 @@
                                 <fieldset>
                                     <div class="form-outline form-white mb-4">
                                         Start Date
-                                        <input type="date" name="start_date" id="start_date" class="form-control form-control-lg" />
+                                        <input type="date" name="start_date" id="start_date" class="form-control form-control-lg" data-default-today/>
                                     </div>
                                 </fieldset>
                                 <fieldset>
@@ -196,7 +196,7 @@
                                 <fieldset>
                                     <div class="form-outline form-white mb-4">
                                         Date
-                                        <input type="date" name="date" id="date" class="form-control form-control-lg" />
+                                        <input type="date" name="date" id="date" class="form-control form-control-lg" data-default-today/>
                                     </div>
                                 </fieldset>
     
@@ -325,5 +325,14 @@
         }
 
         document.querySelector("#target_id").addEventListener("change", (event) => updateParticipantsOnChange(event));
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateFields = document.querySelectorAll('[data-default-today]');
+            dateFields.forEach(field => {
+              const today = new Date();
+              const todayFormatted = today.toISOString().slice(0, 10); // Format as YYYY-MM-DD
+              field.value = todayFormatted;
+            });
+          });
     </script>
 </html>
