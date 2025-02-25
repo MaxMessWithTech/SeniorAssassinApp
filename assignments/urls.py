@@ -1,4 +1,5 @@
 from django.urls import path, re_path
+from django.shortcuts import redirect
 
 from . import views
 
@@ -27,3 +28,9 @@ urlpatterns = [
         name='participantAutocomplete',
     ),
 ]
+
+def custom_404(request, exception):
+    return redirect('/')
+
+
+handler404 = custom_404

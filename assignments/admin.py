@@ -2,6 +2,8 @@ from django.contrib import admin
 
 from .models import Team, Participant, Round, Target, Kill
 
+# Cookbook: https://books.agiliq.com/projects/django-admin-cookbook/en/latest/export.html
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     list_filter = ["id", "name"]
@@ -66,6 +68,10 @@ class KillAdmin(admin.ModelAdmin):
         
         if eliminator.team != target.prosecuting_team:
             raise Exception("Eliminator Participant must be on the Target Prosecuting Team!!!")
-        
+
+
+admin.site.site_header = "SA Admin"
+admin.site.site_title = "SA Admin Portal"
+admin.site.index_title = "Welcome to the Senior Assassin Backend Portal"
         
 
