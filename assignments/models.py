@@ -8,15 +8,16 @@ from smart_selects.db_fields import ChainedForeignKey
 class Team(models.Model):
     id = models.IntegerField(default=0, primary_key=True)
     name = models.CharField(max_length=200)
-    eliminated = models.BooleanField(default=False)
 
+    eliminated = models.BooleanField(default=False)
     eliminated_date=models.DateField(null=True, blank=True)
 
     def generate_viewing_code() -> str:
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
     
+    viewing_code = models.CharField(max_length=8, default=generate_viewing_code, unique=True)
+    
     def get_round_elimed(self):
-        print(self.participants.all())
         filtered_p = list()
         for p in self.participants.all():
             if p.round_eliminated is True and p.eliminated_permanently is False:
@@ -48,8 +49,10 @@ class Team(models.Model):
     
     def get_remaining_count(self):
         return len(self.get_remaining())
+    
+    def get_participants(self):
+        return self.participants.all()
 
-    viewing_code = models.CharField(max_length=8, default=generate_viewing_code, unique=True)
 
     def __str__(self):
         return f"{self.id}-{self.name}"
@@ -63,6 +66,15 @@ class Participant(models.Model):
     # if their team eliminates 3 people on the team they're matched against
     round_eliminated = models.BooleanField(default=False)
     eliminated_permanently = models.BooleanField(default=False)
+
+    def get_color(self):
+        if self.eliminated_permanently:
+            return "#DC4C64"
+        
+        if self.round_eliminated:
+            return "#E4A11B"
+        
+        return "#14A44D"
 
     def __str__(self):
         if self.team is None:

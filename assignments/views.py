@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.template import loader
@@ -8,6 +8,8 @@ import datetime
 from django.db.models import Q
 from django.forms.models import model_to_dict
 import assignments.forms
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
 
 from assignments.models import Team, Participant, Round, Target, Kill
 
@@ -41,7 +43,12 @@ def convertQueryToNameList(query) -> list:
 def index(request):
 	return HttpResponseRedirect(reverse("assignments:login"))
 
-def login(request):
+def login_view(request):
+	# Check if admin is logging in, if so, redirect to admin-control
+	if request.user.is_authenticated:
+		return HttpResponseRedirect(reverse("assignments:admin-control"))
+
+
 	if request.method == 'GET':
 		template = loader.get_template("assignments/login.html")
 		context = {
@@ -50,7 +57,7 @@ def login(request):
 		return HttpResponse(template.render(context, request))
 
 	try:
-		print(request.POST)
+		# print(request.POST)
 		team = Team.objects.get(viewing_code=request.POST["code"])
 	except (KeyError, Team.DoesNotExist):
 		# Redisplay the question voting form.
@@ -159,7 +166,37 @@ def reportKill(request, team_code):
 	return HttpResponse(template.render(context, request))
 
 
-@login_required
+def admin_login_view(request):
+	if request.user.is_authenticated:
+		return HttpResponseRedirect(reverse("assignments:admin-control"))
+
+	if request.method == 'GET':
+		template = loader.get_template("admin_login.html")
+		context = {
+			# "latest_question_list": latest_question_list,
+		}
+		return HttpResponse(template.render(context, request))
+	elif request.method == 'POST':
+		username = request.POST["username"]
+		password = request.POST["password"]
+		
+		user = authenticate(username=username, password=password)
+
+		if user is None:
+			# Redisplay the question voting form.
+			return render(
+				request,
+				"admin_login.html",
+				{
+					"error_message": "Invalid credentials."
+				},
+			)
+		
+		login(request, user)
+		return HttpResponseRedirect(reverse("assignments:admin-control"))
+
+
+@login_required(login_url="/accounts/login/")
 def assignTeamsInRound(request):
 	if request.method != 'POST':
 		return HttpResponseBadRequest("Must be a POST request!")
@@ -213,7 +250,7 @@ def assignTeamsInRound(request):
 	return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
-@login_required
+@login_required(login_url="/accounts/login/")
 def adminControl(request):
 	try:
 		current_round = getCurRound()
@@ -259,13 +296,14 @@ def adminControl(request):
 		'remaining': len(remaining),
 		'round_targets': round_targets,
 		'round_targets_ser': round_target_list,
-		'all_teams': team_list,
+		'teams': all_teams,
+		'team_list': team_list,
 		'participants': participant_list
 	}
 	return HttpResponse(template.render(context, request))
 
 
-@login_required
+@login_required(login_url="/accounts/login/")
 def eliminateParticipant(request):
 	if request.method != 'POST':
 		return HttpResponseBadRequest("Must be a POST request!")
@@ -307,7 +345,7 @@ def eliminateParticipant(request):
 	return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
-@login_required
+@login_required(login_url="/accounts/login/")
 def cleanup_round(request):
 	if request.method != 'POST':
 		return HttpResponseBadRequest("Must be a POST request!")
@@ -374,7 +412,7 @@ class TargetAutocomplete(autocomplete.Select2QuerySetView):
 
 
 
-@login_required
+@login_required(login_url="/accounts/login/")
 def addThings(request):
 	data = 	list()
 	with open('SeniorAssassinTeams.csv', mode ='r') as file:
