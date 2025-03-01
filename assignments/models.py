@@ -52,6 +52,14 @@ class Team(models.Model):
     
     def get_participants(self):
         return self.participants.all()
+    
+    def get_participants_first_name(self):
+        filtered_p = list()
+        for p in self.participants.all():
+            if p.round_eliminated is False and p.eliminated_permanently is False:
+                filtered_p.append(p.name.split(" ")[0])
+
+        return ", ".join(filtered_p)
 
 
     def __str__(self):
