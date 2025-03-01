@@ -3,6 +3,7 @@ import random
 import string
 import django
 from smart_selects.db_fields import ChainedForeignKey
+import math
 
 
 class Team(models.Model):
@@ -84,6 +85,9 @@ class Participant(models.Model):
         
         return "#14A44D"
 
+    def is_eliminated(self):
+        return self.round_eliminated or self.eliminated_permanently
+
     def __str__(self):
         if self.team is None:
             return f"{self.name} from team NO TEAM"
@@ -141,3 +145,78 @@ class Kill(models.Model):
 
     def __str__(self):
         return f"{self.elimed_participant.name} killed by {self.eliminator.name} on {self.date.strftime('%A, %B %d')}"
+
+
+class RuleSuspension(models.Model):
+    type = models.CharField(max_length=100)
+    rules_suspended = models.TextField()
+    notification_time = models.DateTimeField()
+    start_time = models.DateField()
+    end_time = models.DateField()
+
+
+class Issue(models.Model):
+    label = models.CharField(max_length=100)
+    description = models.CharField(max_length=400)
+
+    team_vote = models.BooleanField(default=False)
+
+    def get_for_votes(self):
+        votes = self.votes.filter(in_favor=True)
+
+        count = 0
+
+        for vote in votes:
+            if self.team_vote and not vote.team.eliminated:
+                count += 1
+                continue
+
+            if not vote.participant.is_eliminated():
+                count += 1
+
+        return count
+    
+    def get_against_votes(self):
+        votes = self.votes.filter(in_favor=False)
+
+        count = 0
+
+        for vote in votes:
+            if self.team_vote and not vote.team.eliminated:
+                count += 1
+                continue
+
+            if not vote.participant.is_eliminated():
+                count += 1
+
+        return count
+
+    def get_delta(self):
+        for_votes = self.get_for_votes()
+        against_votes = self.get_against_votes()
+
+        return for_votes-against_votes
+
+    def did_pass(self):
+
+        majority = 0
+
+        if self.team_vote:
+            majority = math.floor(len(Team.objects.filter(is_eliminated=False)) / 2)
+        else:
+            majority = math.floor(len(
+                Participant.objects.filter(round_eliminated=False).filter(eliminated_permanently=False)
+            ))
+
+        for_votes = self.get_for_votes()
+
+        return for_votes >= majority
+
+
+class Vote(models.Model):
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='votes', null=True)
+
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='votes', null=True)
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='votes', null=True)
+
+    in_favor = models.BooleanField(default=False)

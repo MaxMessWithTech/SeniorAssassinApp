@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Team, Participant, Round, Target, Kill
+from .models import Team, Participant, Round, Target, Kill, RuleSuspension, Issue, Vote
 
 # Cookbook: https://books.agiliq.com/projects/django-admin-cookbook/en/latest/export.html
 
@@ -68,6 +68,16 @@ class KillAdmin(admin.ModelAdmin):
         
         if eliminator.team != target.prosecuting_team:
             raise Exception("Eliminator Participant must be on the Target Prosecuting Team!!!")
+
+
+@admin.register(RuleSuspension)
+class RuleSuspensionAdmin(admin.ModelAdmin):
+    list_filter = []
+    search_fields =  []
+
+    list_display = ["id", "type", "notification_time", "start_time", "end_time"]
+
+    # fields = ["target", "elimed_participant", "eliminator", "date"]
 
 
 admin.site.site_header = "SA Admin"

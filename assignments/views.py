@@ -11,7 +11,7 @@ import assignments.forms
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
-from assignments.models import Team, Participant, Round, Target, Kill
+from assignments.models import Team, Participant, Round, Target, Kill, RuleSuspension, Issue, Vote
 
 import csv
 import assignments.handleCSV as handleCSV
@@ -25,6 +25,15 @@ def getCurRound() -> Round:
 	for round in rounds: 
 		if round.start_date <= timezone.now() and round.end_date > timezone.now():
 			return round
+	return None
+
+
+def getCurRuleSuspension () -> RuleSuspension:
+	ruleSuspensions = RuleSuspension.objects.all()
+
+	for r in ruleSuspensions: 
+		if r.notification_time <= timezone.now() and r.end_time > timezone.now().date():
+			return r
 	return None
 
 
@@ -139,6 +148,8 @@ def home(request, team_code):
 					"body": f"{kill.eliminator.name} killed {kill.elimed_participant.name} on {kill.date.strftime('%B %d')}"
 				})
 
+		ruleSuspension = getCurRuleSuspension()
+
 		template = loader.get_template("assignments/home.html")
 		context = {
 			'team_code': team.viewing_code,
@@ -154,6 +165,7 @@ def home(request, team_code):
 			'roundElimedTeam': ', '.join(roundElimedTeam),
 			'permElimedTeam': ', '.join(permElimedTeam),
 			'cur_target':cur_target,
+			'rule_suspension': ruleSuspension
 
 		}
 		return HttpResponse(template.render(context, request))
