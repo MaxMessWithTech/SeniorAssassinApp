@@ -161,6 +161,8 @@ class Issue(models.Model):
 
     team_vote = models.BooleanField(default=False)
 
+    closed = models.BooleanField(default=False)
+
     def get_for_votes(self):
         votes = self.votes.filter(in_favor=True)
 
@@ -197,8 +199,7 @@ class Issue(models.Model):
 
         return for_votes-against_votes
 
-    def did_pass(self):
-
+    def get_majority(self):
         majority = 0
 
         if self.team_vote:
@@ -206,7 +207,13 @@ class Issue(models.Model):
         else:
             majority = math.floor(len(
                 Participant.objects.filter(round_eliminated=False).filter(eliminated_permanently=False)
-            ))
+            ) / 2)
+
+        return majority
+
+    def did_pass(self):
+
+        majority = self.get_majority()
 
         for_votes = self.get_for_votes()
 
@@ -214,9 +221,9 @@ class Issue(models.Model):
 
 
 class Vote(models.Model):
-    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='votes', null=True)
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='votes')
 
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='votes', null=True)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='votes')
     participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='votes', null=True)
 
     in_favor = models.BooleanField(default=False)

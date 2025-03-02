@@ -8,9 +8,11 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("login", views.login_view, name="login"),
     path("home/<team_code>", views.home, name="home"),
+     path("vote/<team_code>/<issue_id>", views.vote, name="vote"),
+
     path("home/<team_code>/report-kill", views.reportKill, name="report-kill"),
-    path("add-things", views.addThings, name="add-things"),
     path("assign-teams-in-round", views.assignTeamsInRound, name="assign-teams"),
+    path("add-things", views.addThings, name="add-things"),
     path("eliminate-participant", views.eliminateParticipant, name="eliminate-participant"),
     path("cleanup_round", views.cleanup_round, name="cleanup_round"),
     path("admin-control", views.adminControl, name="admin-control"),

@@ -107,72 +107,78 @@ def home(request, team_code):
 
 		return HttpResponse(dneTemplate.render({'nextRound': nextRound}, request))
 
-	else:
 
-		cur_round_targets = Target.objects.filter(round = current_round).filter(prosecuting_team = team)
+	cur_round_targets = Target.objects.filter(round = current_round).filter(prosecuting_team = team)
 
-		if len(cur_round_targets) != 1:
-			print(f"Invalid number of targets!! Currently has {cur_round_targets}")
+	if len(cur_round_targets) != 1:
+		print(f"Invalid number of targets!! Currently has {cur_round_targets}")
 
-		cur_target = cur_round_targets[0]
+	cur_target = cur_round_targets[0]
 
-		# Get target participants
-		target_participant_objs = Participant.objects.filter(team=cur_target.target_team).filter(eliminated_permanently=False)
-		target_participants = convertQueryToNameList(target_participant_objs)
+	# Get target participants
+	target_participant_objs = Participant.objects.filter(team=cur_target.target_team).filter(eliminated_permanently=False)
+	target_participants = convertQueryToNameList(target_participant_objs)
 
-		# Get Eliminated Targets
-		eliminated_targets = target_participant_objs.filter(round_eliminated=True)
-		elimed_targets = convertQueryToNameList(eliminated_targets)
+	# Get Eliminated Targets
+	eliminated_targets = target_participant_objs.filter(round_eliminated=True)
+	elimed_targets = convertQueryToNameList(eliminated_targets)
 
 
-		# Get Remaining Team Members
-		remainingMembersObjs = Participant.objects.filter(team=team).filter(round_eliminated=False).filter(eliminated_permanently=False)
-		remainingMembers = convertQueryToNameList(remainingMembersObjs)
+	# Get Remaining Team Members
+	remainingMembersObjs = Participant.objects.filter(team=team).filter(round_eliminated=False).filter(eliminated_permanently=False)
+	remainingMembers = convertQueryToNameList(remainingMembersObjs)
 
-		# Get Round Elimed Team Members
-		roundElimedMembersObjs = Participant.objects.filter(team=team).filter(round_eliminated=True).filter(eliminated_permanently=False)
-		roundElimedTeam = convertQueryToNameList(roundElimedMembersObjs)
+	# Get Round Elimed Team Members
+	roundElimedMembersObjs = Participant.objects.filter(team=team).filter(round_eliminated=True).filter(eliminated_permanently=False)
+	roundElimedTeam = convertQueryToNameList(roundElimedMembersObjs)
 
-		# Get Perm Elimed Team Members
-		permElimedObjs = Participant.objects.filter(team=team).filter(eliminated_permanently=True)
-		permElimedTeam = convertQueryToNameList(permElimedObjs)
+	# Get Perm Elimed Team Members
+	permElimedObjs = Participant.objects.filter(team=team).filter(eliminated_permanently=True)
+	permElimedTeam = convertQueryToNameList(permElimedObjs)
+	
 
-		
+	notifications = list()
 
-		notifications = list()
+	kills = Kill.objects.filter(target=cur_target)
+	
+	for kill in kills:
+		timedelta = kill.date - timezone.now().date()
+		if timedelta.days <= 7: 
+			notifications.append({
+				"header": "New Kill",
+				"body": f"{kill.eliminator.name} killed {kill.elimed_participant.name} on {kill.date.strftime('%B %d')}",
+				"link": None
+			})
 
-		kills = Kill.objects.filter(target=cur_target)
-		
-		for kill in kills:
-			timedelta = kill.date - timezone.now().date()
-			if timedelta.days <= 7: 
-				notifications.append({
-					"header": "New Kill",
-					"body": f"{kill.eliminator.name} killed {kill.elimed_participant.name} on {kill.date.strftime('%B %d')}"
-				})
+	for issue in Issue.objects.filter(closed=False):
+		notifications.append({
+			"header": "New Vote",
+			"body": f"{issue.label}. For: {issue.get_for_votes()}, against: {issue.get_against_votes()}, required to pass: {issue.get_majority()}",
+			"link": f"/vote/{team_code}/{issue.id}"	
+		})
 
-		ruleSuspension = getCurRuleSuspension()
-		print(ruleSuspension)
+	ruleSuspension = getCurRuleSuspension()
+	print(ruleSuspension)
 
-		template = loader.get_template("assignments/home.html")
-		context = {
-			'team_code': team.viewing_code,
-			'team_name': team.name,
-			'current_round_index': current_round_index,
-			'cur_round_start': current_round.start_date,
-			'cur_round_end': current_round.end_date,
-			'target_participants': ', '.join(target_participants),
-			'elimed_targets':  ', '.join(elimed_targets),
-			'target_name': cur_target.target_team.name,
-			'notifications': notifications,
-			'remaining_members': ', '.join(remainingMembers),
-			'roundElimedTeam': ', '.join(roundElimedTeam),
-			'permElimedTeam': ', '.join(permElimedTeam),
-			'cur_target':cur_target,
-			'rule_suspension': ruleSuspension
+	template = loader.get_template("assignments/home.html")
+	context = {
+		'team_code': team.viewing_code,
+		'team_name': team.name,
+		'current_round_index': current_round_index,
+		'cur_round_start': current_round.start_date,
+		'cur_round_end': current_round.end_date,
+		'target_participants': ', '.join(target_participants),
+		'elimed_targets':  ', '.join(elimed_targets),
+		'target_name': cur_target.target_team.name,
+		'notifications': notifications,
+		'remaining_members': ', '.join(remainingMembers),
+		'roundElimedTeam': ', '.join(roundElimedTeam),
+		'permElimedTeam': ', '.join(permElimedTeam),
+		'cur_target':cur_target,
+		'rule_suspension': ruleSuspension
 
-		}
-		return HttpResponse(template.render(context, request))
+	}
+	return HttpResponse(template.render(context, request))
 
 def reportKill(request, team_code):
 	template = loader.get_template("assignments/home.html")
@@ -181,6 +187,53 @@ def reportKill(request, team_code):
 	}
 	return HttpResponse(template.render(context, request))
 
+
+def vote(request, team_code, issue_id):
+	if request.method == 'POST':
+		print(request.POST)
+		pID = int(request.POST["participant"])
+		inFavor = False
+		if "inFavor" in request.POST:
+			inFavor = request.POST["inFavor"] == "on"
+
+		participant = Participant.objects.filter(id=pID).first()
+
+		vote = Vote(
+			issue=Issue.objects.filter(id=issue_id).first(),
+			team=participant.team,
+			participant=participant,
+			in_favor=inFavor
+		)
+		vote.save()
+
+		return HttpResponseRedirect(reverse("assignments:home", args=(team_code,)))
+
+
+	team = Team.objects.filter(viewing_code=team_code).first()
+	participants = team.participants.all()
+	issue = Issue.objects.filter(id=issue_id).first()
+
+	p_list = list()
+
+	for p in participants:
+		if not issue.votes.filter(participant=p).first():
+			p_list.append(p)
+
+
+
+	template = loader.get_template("assignments/vote.html")
+	context = {
+		'team_code': team_code,
+		'participants': p_list,
+		'team': team,
+		'issue':issue
+	}
+	return HttpResponse(template.render(context, request)) 
+
+
+# ADMIN
+# ADMIN
+# ADMIN
 
 def admin_login_view(request):
 	if request.user.is_authenticated:

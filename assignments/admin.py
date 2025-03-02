@@ -79,6 +79,25 @@ class RuleSuspensionAdmin(admin.ModelAdmin):
 
     # fields = ["target", "elimed_participant", "eliminator", "date"]
 
+@admin.register(Issue)
+class IssueAdmin(admin.ModelAdmin):
+    list_filter = []
+    search_fields =  []
+
+    list_display = ["label", "description", "team_vote", "get_for_votes", "get_against_votes", "did_pass"]
+
+    # fields = ["target", "elimed_participant", "eliminator", "date"]
+
+
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+    list_filter = ["issue", "team", "in_favor"]
+    search_fields =  ["in_favor"]
+
+    list_display = ["issue", "team", "participant", "in_favor"]
+
+    # fields = ["target", "elimed_participant", "eliminator", "date"]
+
 
 admin.site.site_header = "SA Admin"
 admin.site.site_title = "SA Admin Portal"
