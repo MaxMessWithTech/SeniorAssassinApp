@@ -200,10 +200,9 @@
           
           <button 
             class="btn btn-danger btn-lg notification-btn" 
-            href="#offcanvasExample"
             type="button" 
-            data-bs-toggle="offcanvas" 
-            data-bs-target="#offcanvasExample" 
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasExample"
             aria-controls="offcanvasExample"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
@@ -211,10 +210,14 @@
             </svg>
           </button>
 
+          <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+            Button with data-bs-target
+          </button>
+
           <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
             <div class="offcanvas-header">
               <h5 class="offcanvas-title" id="offcanvasExampleLabel">Notifications</h5>
-              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasExample"  aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
               <ul class="list-group">
@@ -230,8 +233,8 @@
               </ul>
             </div>
           </div>
-
-          <div id="myModal" class="modal hide fade d-flex justify-content-center " tabindex="-1" aria-hidden="true">
+          
+          <div id="myModal" class="modal hide fade d-flex justify-content-center " tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-confirm ">
               <div class="modal-content">
 
@@ -239,7 +242,7 @@
                   <div class="icon-box">
                     <i class="material-symbols-outlined">skull</i>
                   </div>				
-                  <h4 class="modal-title w-100">{{rule_suspension.type}}</h4>	
+                  <h4 class="modal-title w-100" id="exampleModalLabel">{{rule_suspension.type}}</h4>	
                 </div>
 
                 <div class="modal-body">
@@ -247,7 +250,7 @@
                 </div>
 
                 <div class="modal-footer">
-                  <button id="model-dismiss" class="btn btn-danger btn-block" data-dismiss="myModal">OK</button>
+                  <button id="model-dismiss" class="btn btn-danger btn-block" data-bs-dismiss="modal" data-bs-target="#myModal">OK</button>
                 </div>
 
               </div>
@@ -256,16 +259,28 @@
    
         </body>
 
+        
         {% if rule_suspension is not None %}
         <script type="text/javascript">
-          var myModal = new bootstrap.Modal(document.getElementById('myModal'), {})
+          let myModal = new bootstrap.Modal(document.getElementById('myModal'), {})
+          
           myModal.show()
         </script>
         {% endif %}
+       <!--
         <script type="text/javascript">
+          // var myModal = new bootstrap.Modal(document.getElementById('myModal'), {})
 
           document.getElementById('model-dismiss').addEventListener("click", () => {
             myModal.hide()
           });
+          document.getElementById('notification-dismiss').addEventListener("click", () => {
+            notificationOffCanvas.hide()
+          });
+
+          document.getElementById('notifications-btn').addEventListener("click", () => {
+            notificationOffCanvas.show()
+          });
         </script>
+        -->
 </html>

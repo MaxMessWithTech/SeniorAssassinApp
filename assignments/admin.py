@@ -20,7 +20,7 @@ def revive_participant(modeladmin, request, queryset):
 class ParticipantAdmin(admin.ModelAdmin):
     list_filter = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
     search_fields = ["id", "name"]
-    fields = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
+    fields = ["name", "team", "round_eliminated", "eliminated_permanently"]
     list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
 
     actions = [revive_participant]
