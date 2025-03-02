@@ -157,7 +157,7 @@ class RuleSuspension(models.Model):
 
 class Issue(models.Model):
     label = models.CharField(max_length=100)
-    description = models.CharField(max_length=400)
+    description = models.TextField()
 
     team_vote = models.BooleanField(default=False)
 
