@@ -173,7 +173,7 @@ class Issue(models.Model):
                 count += 1
                 continue
 
-            if not vote.participant.is_eliminated():
+            elif not vote.participant.is_eliminated():
                 count += 1
 
         return count
@@ -203,7 +203,7 @@ class Issue(models.Model):
         majority = 0
 
         if self.team_vote:
-            majority = math.floor(len(Team.objects.filter(is_eliminated=False)) / 2)
+            majority = math.floor(len(Team.objects.filter(eliminated=False)) / 2)
         else:
             majority = math.floor(len(
                 Participant.objects.filter(round_eliminated=False).filter(eliminated_permanently=False)
