@@ -151,8 +151,8 @@ class RuleSuspension(models.Model):
     type = models.CharField(max_length=100)
     rules_suspended = models.TextField()
     notification_time = models.DateTimeField()
-    start_time = models.DateField()
-    end_time = models.DateField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
 
 
 class Issue(models.Model):

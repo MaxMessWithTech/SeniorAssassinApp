@@ -252,9 +252,13 @@
    
         </body>
 
+        {% if rule_suspension is not None %}
         <script type="text/javascript">
           var myModal = new bootstrap.Modal(document.getElementById('myModal'), {})
           myModal.show()
+        </script>
+        {% endif %}
+        <script type="text/javascript">
 
           document.getElementById('model-dismiss').addEventListener("click", () => {
             myModal.hide()

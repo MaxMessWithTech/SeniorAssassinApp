@@ -30,9 +30,12 @@ def getCurRound() -> Round:
 
 def getCurRuleSuspension () -> RuleSuspension:
 	ruleSuspensions = RuleSuspension.objects.all()
+	print(ruleSuspensions)
+	print(timezone.now())
 
 	for r in ruleSuspensions: 
-		if r.notification_time <= timezone.now() and r.end_time > timezone.now().date():
+		print(r.end_time > timezone.now(), r.end_time, timezone.now())
+		if r.notification_time <= timezone.now() and r.end_time > timezone.now():
 			return r
 	return None
 
@@ -149,6 +152,7 @@ def home(request, team_code):
 				})
 
 		ruleSuspension = getCurRuleSuspension()
+		print(ruleSuspension)
 
 		template = loader.get_template("assignments/home.html")
 		context = {
