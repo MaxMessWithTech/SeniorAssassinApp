@@ -299,6 +299,73 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Create Purge Day -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button 
+                            class="accordion-button collapsed" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapseSeven" 
+                            aria-controls="collapseSeven"
+                            aria-expanded="false" 
+                        >
+                            Create Purge Day
+                        </button>
+                    </h2>
+                    <div id="collapseSeven" class="accordion-collapse collapse" data-bs-parent="#accordionParent">
+                        <div class="accordion-body">
+                            <form action="{% url 'assignments:create_purge' %}" method="post">
+                                {% csrf_token %}
+
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        Type
+                                        <input type="text" name="type" id="type" class="form-control form-control-lg" value="PURGE DAY"/>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        <label for="rules_suspended" class="form-label">Rules Suspended</label>
+                                        <textarea class="form-control" name="rules_suspended" id="rules_suspended" rows="3">
+Floaties no longer afford ANY protection. Protections for school sanctioned activities and work are still in place
+</textarea>
+                                      </div>
+                                </fieldset>
+
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        Start Time
+                                        <input type="time" name="start_time" id="start_time" class="form-control form-control-lg"/>
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <div class="form-outline form-white mb-4">
+                                        End Time
+                                        <input type="time" name="end_time" id="end_time" class="form-control form-control-lg" />
+                                    </div>
+                                </fieldset>
+    
+                                <input 
+                                    data-mdb-button-init 
+                                    data-mdb-ripple-init 
+                                    class="btn btn-outline-danger btn-lg px-5" 
+                                    type="submit"
+                                    value="Create Purge"
+                                />
+    
+                                {% if error_message %}
+                                <div class="alert alert-primary alert-dismissible alert-fixed" role="alert" style="pos">
+                                    <div>{{ error_message }}</div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         </div>

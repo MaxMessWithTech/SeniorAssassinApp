@@ -506,29 +506,62 @@ def cleanup_round(request):
 	return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
-class ParticipantAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated:
-            return Participant.objects.none()
-
-        qs = Participant.objects.all()
-
-        if self.q:
-            qs = qs.filter(name__istartswith=self.q)
-
-        return qs
+def random_date(start_date:datetime.date, end_date:datetime.date):
+    time_between_dates = end_date - start_date
+    days_between_dates = time_between_dates.days
+    random_number_of_days = random.randrange(days_between_dates)
+    random_date = start_date + datetime.timedelta(days=random_number_of_days)
+    return random_date
 
 
-class TargetAutocomplete(autocomplete.Select2QuerySetView):
-	def get_queryset(self):
-		if not self.request.user.is_authenticated:
-			return Target.objects.none()
-		qs = Target.objects.all()
-		if self.q:
-			qs = qs.filter(name__istartswith=self.q) # Adjust filter as needed
-		return qs
+@login_required(login_url="/accounts/login/")
+def create_purge(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest("Must be a POST request!")
+	
+	if "type" not in request.POST:
+		return HttpResponseBadRequest("missing 'type' param!")
+	if "rules_suspended" not in request.POST:
+		return HttpResponseBadRequest("missing 'rules_suspended' param!")
+	
+	"""
+	if "notification_time" not in request.POST:
+		return HttpResponseBadRequest("missing 'notification_time' param!")
+	
+	if "start_time" not in request.POST:
+		return HttpResponseBadRequest("missing 'start_time' param!")
+	if "end_time" not in request.POST:
+		return HttpResponseBadRequest("missing 'end_time' param!")
+	"""
+	round = getCurRound()
+	random_purge_day = random_date(round.start_date.date(), round.end_date.date())
+	start = datetime.datetime.combine(
+		random_purge_day, 
+		datetime.time.fromisoformat(request.POST["start_time"])
+	)
+	end = datetime.datetime.combine(
+		random_purge_day + datetime.timedelta(days=1), 
+		datetime.time.fromisoformat(request.POST["end_time"])
+	)
+	notification = start - datetime.timedelta(hours=12)
 
+	print(f"{start} - {end}")
+
+	
+	
+	rule_suspension = RuleSuspension(
+		type=request.POST["type"],
+		rules_suspended=request.POST["rules_suspended"],
+		notification_time=notification,
+		start_time=start,
+		end_time=end,
+
+	)
+
+	rule_suspension.save()
+	
+	return HttpResponseRedirect(reverse("assignments:admin-control"))
+	
 
 
 @login_required(login_url="/accounts/login/")
