@@ -158,7 +158,6 @@ def home(request, team_code):
 		})
 
 	ruleSuspension = getCurRuleSuspension()
-	print(ruleSuspension)
 
 	template = loader.get_template("assignments/home.html")
 	context = {
@@ -187,6 +186,57 @@ def reportKill(request, team_code):
 	}
 	return HttpResponse(template.render(context, request))
 
+
+def gameStatus(request):
+	try:
+		current_round = getCurRound()
+
+		if current_round is None:
+			current_round = Round.objects.first()
+		current_round_index = current_round.index
+
+		round_elims = Participant.objects.filter(round_eliminated=True, eliminated_permanently=False)
+		perm_elims = Participant.objects.filter(eliminated_permanently=True)
+		remaining = Participant.objects.filter(round_eliminated=False, eliminated_permanently=False)
+	except Exception as e:
+		print(e)
+		current_round = None
+		current_round_index = -1
+
+		round_elims = []
+		perm_elims = []
+		remaining = []
+	
+	round_targets = Target.objects.filter(round=current_round)
+	round_target_list = list()
+	for target in round_targets:
+		round_target_list.append(model_to_dict(target))
+
+
+	all_teams = Team.objects.all()
+	team_list = list()
+	for team in all_teams:
+		team_list.append(model_to_dict(team))
+
+	participants = Participant.objects.all()
+	participant_list = list()
+	for participant in participants:
+		participant_list.append(model_to_dict(participant))
+
+	template = loader.get_template("assignments/gameStatus.html")
+	context = {
+		'current_round': current_round,
+		'current_round_index': current_round_index,
+		'eliminated_this_round': len(round_elims),
+		'eliminated_permanently': len(perm_elims),
+		'remaining': len(remaining),
+		'round_targets': round_targets,
+		'round_targets_ser': round_target_list,
+		'teams': all_teams,
+		'team_list': team_list,
+		'participants': participant_list
+	}
+	return HttpResponse(template.render(context, request))
 
 def vote(request, team_code, issue_id):
 	if request.method == 'POST':

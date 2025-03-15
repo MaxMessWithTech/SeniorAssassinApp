@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>UHS SA | Status</title>
+
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        {% load math_filters %}
+        {% load target_filters %}
+        {% load static %}
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+
+        <style>
+            .gradient-custom {
+                /* fallback for old browsers */
+                background: #6a11cb;
+                
+                /* Chrome 10-25, Safari 5.1-6 */
+                background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+                
+                /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+                background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
+            };
+        </style>
+    </head>
+    <body style="background: black;">
+        <section class="gradient-custom">
+        <div class="container py-5">
+        <div class="row d-flex justify-content-center align-items-center" style="min-height: 100vh">
+        <div class="col-20 col-md-16 col-lg-10 col-xl-8">
+        <div class="card bg-dark" style="border-radius: 1rem; height: 90%">
+        <div class="card-body p-5 text-center">
+
+            <div style="background: white; border-radius: .25rem; padding: 1rem;">
+                <h2 class="fw-bold mb-4 text-uppercase text-lg-left">Game Status</h2>
+                <p style="margin-bottom: 1rem"><strong>Current Round:</strong>              {{current_round_index}} </p>
+                <p style="margin-bottom: 1rem"><strong>Start:</strong>                      {{current_round.start_date}} </p>
+                <p style="margin-bottom: 1rem"><strong>End:</strong>                        {{current_round.end_date}} </p>
+                <p style="margin-bottom: 1rem"><strong>Eliminated This Round:</strong>      {{eliminated_this_round}} </p>
+                <p style="margin-bottom: 1rem"><strong>Eliminated Permanently:</strong>     {{eliminated_permanently}} </p>
+                <p style="margin-bottom: 1rem"><strong>Remaining:</strong>                  {{remaining}} </p>
+            </div>
+            
+            <ul class="list-group">
+                {% for team in teams %}
+                    
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto text-start">
+                        <div class="fw-bold">Team: {{team.name}}</div>
+                        <ul class="list-group">
+                            {% for p in team.get_participants %}
+                                <li style="color: {{p.get_color}};">{{p.name}}</li>
+                            {% endfor %}
+                        </ul>
+                        <a class="btn btn-primary" href="/home/{{team.viewing_code}}" role="button">Open</a>
+                    </div>
+                    <span class="badge bg-danger rounded-pill">{{team.get_perm_elimed_count}}</span>
+                    <span class="badge bg-warning text-dark rounded-pill">{{team.get_round_elimed_count}}</span>
+                    <span class="badge bg-success rounded-pill">{{team.get_remaining_count}}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        </div>
+        </div>
+        </section>
+    </body>
+
+    {{ team_list|json_script:"team_list" }}
+    {{ participants|json_script:"participants" }}
+    {{ round_targets_ser|json_script:"round_targets_ser" }}
+    
+    <script>
+        const team_list = JSON.parse(document.getElementById('team_list').textContent);
+        const participants = JSON.parse(document.getElementById('participants').textContent);
+        const round_targets = JSON.parse(document.getElementById('round_targets_ser').textContent);
+
+        let updateParticipantsOnChange = (event) => {
+            console.log(event)
+            console.log(team_list);
+            console.log(participants);
+            console.log(round_targets);
+
+            let elimArray = [];
+            let killerArray = [];
+            let target = {};
+
+            // Get Target Object
+            for (let i = 0; i < round_targets.length; i++) {
+                if (round_targets[i].id === parseInt(event.target.value)) {
+                    target = round_targets[i];
+                    break;
+                }
+            }
+
+            for (let i = 0; i < team_list.length; i++) {
+                let team = team_list[i];
+
+                if (team.id === target.target_team) {
+                    for (let j = 0; j < participants.length; j++) {
+                        let participant = participants[j];
+                        if (participant.team === team.id) {
+                            elimArray.push(
+                                '<option id="' + participant.id + '" value="' + participant.id + '">' + participant.name + '</option>'
+                            )
+                        }
+                    }
+                }
+
+                else if (team.id === target.prosecuting_team) {
+                    for (let j = 0; j < participants.length; j++) {
+                        
+                        let participant = participants[j];
+                        if (participant.team === team.id) {
+                            killerArray.push(
+                                '<option id="' + participant.id + '" value="' + participant.id + '">' + participant.name + '</option>'
+                            )
+                        }
+                    }
+                }
+            }
+
+            console.log(elimArray);
+
+            document.querySelector('#elimed_participant_id').innerHTML = elimArray.join("");
+            document.querySelector('#eliminator_id').innerHTML = killerArray.join("");
+        }
+
+        document.querySelector("#target_id").addEventListener("change", (event) => updateParticipantsOnChange(event));
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateFields = document.querySelectorAll('[data-default-today]');
+            dateFields.forEach(field => {
+              const today = new Date();
+              const todayFormatted = today.toISOString().slice(0, 10); // Format as YYYY-MM-DD
+              field.value = todayFormatted;
+            });
+          });
+    </script>
+</html>
