@@ -129,6 +129,9 @@ class Kill(models.Model):
 
     date = models.DateField(default=django.utils.timezone.now)
 
+    def get_round(self):
+        return self.target.round
+
     def save(self, *args, **kwargs):
         if not self.pk:
             # This code only happens if the objects is

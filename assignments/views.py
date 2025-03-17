@@ -223,6 +223,16 @@ def gameStatus(request):
 	for participant in participants:
 		participant_list.append(model_to_dict(participant))
 
+	kills = Kill.objects.all().order_by('date')
+	round_kills = list()
+	for kill in kills:
+		print(kill.get_round(), current_round)
+		if kill.get_round().index == current_round.index:
+			round_kills.append(kill)
+
+	print(kills)
+	print(round_kills)
+
 	template = loader.get_template("assignments/gameStatus.html")
 	context = {
 		'current_round': current_round,
@@ -234,7 +244,8 @@ def gameStatus(request):
 		'round_targets_ser': round_target_list,
 		'teams': all_teams,
 		'team_list': team_list,
-		'participants': participant_list
+		'participants': participant_list,
+		'round_kills': round_kills
 	}
 	return HttpResponse(template.render(context, request))
 

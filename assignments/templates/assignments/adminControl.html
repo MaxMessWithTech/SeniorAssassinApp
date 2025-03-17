@@ -435,11 +435,23 @@ Floaties no longer afford ANY protection. Protections for school sanctioned acti
 
         document.querySelector("#target_id").addEventListener("change", (event) => updateParticipantsOnChange(event));
 
+        function toLocalISOString() {
+            const date = new Date();
+            const timezoneOffset = date.getTimezoneOffset() * 60 * 1000; // Offset in milliseconds
+            const localDate = new Date(date.getTime() - timezoneOffset);
+            const isoString = localDate.toISOString().slice(0, -5); // Remove milliseconds and "Z"
+            const offsetHours = Math.abs(date.getTimezoneOffset() / 60);
+            const offsetMinutes = Math.abs(date.getTimezoneOffset() % 60);
+            const offsetSign = date.getTimezoneOffset() > 0 ? '-' : '+';
+            const formattedOffset = `${offsetSign}${String(offsetHours).padStart(2, '0')}:${String(offsetMinutes).padStart(2, '0')}`;
+            return `${isoString}${formattedOffset}`;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const dateFields = document.querySelectorAll('[data-default-today]');
             dateFields.forEach(field => {
               const today = new Date();
-              const todayFormatted = today.toISOString().slice(0, 10); // Format as YYYY-MM-DD
+              const todayFormatted = toLocalISOString(today).slice(0, 10); // Format as YYYY-MM-DD
               field.value = todayFormatted;
             });
           });
