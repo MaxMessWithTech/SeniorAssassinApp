@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import format_html
 
 from .models import Team, Participant, Round, Target, Kill, RuleSuspension, Issue, Vote
 
@@ -41,10 +43,28 @@ class KillAdmin(admin.ModelAdmin):
     list_filter = ["target", "elimed_participant", "eliminator"]
     search_fields =  ["date"]
 
+    list_display = ["id", "date", "round", "link_to_target", "elimed_participant_name", "eliminator_name"]
+
     # fields = ["target", "elimed_participant", "eliminator", "date"]
 
     def get_target(self, obj):
         return obj.target
+    
+    def round(self, obj):
+        return obj.target.round.index
+    
+    def target_id(self, obj):
+        return obj.target
+    
+    def link_to_target(self, obj):
+        link = reverse("admin:assignments_target_change", args=[obj.target.id])
+        return format_html('<a href="{}">Edit {}</a>', link, obj.target.id)
+    
+    def elimed_participant_name(self, obj):
+        return obj.elimed_participant.name
+    
+    def eliminator_name(self, obj):
+        return obj.eliminator.name
     
     # OVERRIDE
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
