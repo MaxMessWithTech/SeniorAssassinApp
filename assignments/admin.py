@@ -50,21 +50,31 @@ class KillAdmin(admin.ModelAdmin):
     def get_target(self, obj):
         return obj.target
     
-    def round(self, obj):
-        return obj.target.round.index
-    
     def target_id(self, obj):
         return obj.target
     
     def link_to_target(self, obj):
         link = reverse("admin:assignments_target_change", args=[obj.target.id])
-        return format_html('<a href="{}">Edit {}</a>', link, obj.target.id)
+        return format_html('<a href="{}">{}</a>', link, obj.target.id)
+    
+    def link_to_participant(self, obj):
+        link = reverse("admin:assignments_participant_change", args=[obj.id])
+        return format_html('<a href="{}">{}</a>', link, obj.name)
+    
+    def round(self, obj):
+        link = reverse("admin:assignments_round_change", args=[obj.target.round.id])
+        return format_html('<a href="{}">{}</a>', link, obj.target.round.index)
     
     def elimed_participant_name(self, obj):
-        return obj.elimed_participant.name
+        return self.link_to_participant(obj.elimed_participant)
     
     def eliminator_name(self, obj):
-        return obj.eliminator.name
+        return self.link_to_participant(obj.eliminator)
+    
+    link_to_target.short_description = "target"
+    round.short_description = "round"
+    elimed_participant_name.short_description = "eliminated"
+    eliminator_name.short_description = "eliminator"
     
     # OVERRIDE
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
