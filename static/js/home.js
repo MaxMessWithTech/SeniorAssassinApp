@@ -37,6 +37,7 @@ function startCountdown() {
     if (distance < 0) {
       purgeCountdownDiv.style.display = "none";
       clearInterval(x);
+      startEndCountdown();
       return;
     }
     purgeCountdownDiv.style.display = "flex";
@@ -84,4 +85,12 @@ function startEndCountdown() {
 
 if (rule_suspension) {
     purgeModel.show();
+
+    if (getDistance(countDownDate) > 0) {
+        startCountdown();
+    }
+
+    else if (getDistance(countDownEndDate) > 0) {
+        startEndCountdown();
+    }
 }
