@@ -61,6 +61,11 @@ class KillAdmin(admin.ModelAdmin):
         link = reverse("admin:assignments_participant_change", args=[obj.id])
         return format_html('<a href="{}">{}</a>', link, obj.name)
     
+    def link(self, obj):
+        if obj.video_link is not None:
+            return format_html('<a href="{}">{}</a>', obj.video_link, "Link")
+        return "-"
+    
     def round(self, obj):
         link = reverse("admin:assignments_round_change", args=[obj.target.round.id])
         return format_html('<a href="{}">{}</a>', link, obj.target.round.index)
@@ -75,6 +80,7 @@ class KillAdmin(admin.ModelAdmin):
     round.short_description = "round"
     elimed_participant_name.short_description = "eliminated"
     eliminator_name.short_description = "eliminator"
+    link.short_description = "Video Link"
     
     # OVERRIDE
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
