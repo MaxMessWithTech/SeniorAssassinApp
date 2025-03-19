@@ -52,7 +52,7 @@
                 <ul class="list-group">
                     {% for kill in round_kills %}
                     <li class="list-group-item d-flex justify-content-between align-items-start">
-                        {{kill}}
+                        <strong>{{kill.id}}:</strong> {{kill}}
                         {% if kill.video_link is not None %}
                         <a class="btn btn-primary" href="{{kill.video_link}}" role="button" target="_blank">Video</a>
                         {% endif %}
