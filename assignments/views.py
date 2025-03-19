@@ -428,7 +428,7 @@ def adminControl(request):
 		'round_targets_ser': round_target_list,
 		'teams': all_teams,
 		'team_list': team_list,
-		'participants': participant_list
+		'participants': participant_list,
 	}
 	return HttpResponse(template.render(context, request))
 
@@ -460,6 +460,13 @@ def eliminateParticipant(request):
 		Participant, id=int(request.POST["eliminator_id"])
 	)
 	
+	if elimed_participant.round_eliminated or elimed_participant.eliminated_permanently:
+		template = loader.get_template("assignments/failedToKill.html")
+		context = {
+			
+		}
+		return HttpResponse(template.render(context, request))  
+
 	kill = Kill(
 		target = target,
 		elimed_participant = elimed_participant,
@@ -472,7 +479,20 @@ def eliminateParticipant(request):
 	elimed_participant.round_eliminated = True
 	elimed_participant.save()
 
-	return HttpResponseRedirect(reverse("assignments:admin-control"))
+	eliminator_name_split = eliminator.name.split(" ")
+	eliminator_ln = eliminator_name_split[len(eliminator_name_split) - 1]
+	eliminated_name_split = elimed_participant.name.split(" ")
+	eliminated_ln = eliminated_name_split[len(eliminated_name_split) - 1]
+
+	drive_text = f"{kill.id}-{eliminator_ln}Killed{eliminated_ln}"
+
+	template = loader.get_template("assignments/eliminatedParticipant.html")
+	context = {
+		'kill': kill,
+		'drive_text': drive_text
+	}
+	return HttpResponse(template.render(context, request)) 
+	# return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
 @login_required(login_url="/accounts/login/")
