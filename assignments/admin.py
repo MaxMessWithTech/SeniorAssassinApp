@@ -43,7 +43,7 @@ class KillAdmin(admin.ModelAdmin):
     list_filter = ["target", "elimed_participant", "eliminator"]
     search_fields =  ["date"]
 
-    list_display = ["id", "date", "round", "link_to_target", "elimed_participant_name", "eliminator_name"]
+    list_display = ["id", "date", "round", "link_to_target", "elimed_participant_name", "eliminator_name", "link"]
 
     fields = ["elimed_participant", "eliminator", "date", "video_link"]
 
