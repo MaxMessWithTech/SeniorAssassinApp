@@ -146,6 +146,21 @@
 
               width:100%;
             }
+            #purge-end-countdown {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+
+              text-align: center;
+
+              border-style: solid;
+              border-width: 1px;
+              border-color: black;
+              padding:5px;
+
+              width:100%;
+            }
             #purge-countdown-child {
               display: flex;
               flex-direction: row;
@@ -306,6 +321,24 @@
                   </div>
                 </div>
               </div>
+
+              <div id="purge-end-countdown" style="display:none">
+                <h1>End:</h1>
+                <div id="purge-countdown-child">
+                  <div class="col-3">
+                    <h3 id="hours2" class="display-4">00</h3>
+                    <p>Hours</p>
+                  </div>
+                  <div class="col-3">
+                    <h3 id="minutes2" class="display-4">00</h3>
+                    <p>Minutes</p>
+                  </div>
+                  <div class="col-3">
+                    <h3 id="seconds2" class="display-4">00</h3>
+                    <p>Seconds</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="modal-footer">
@@ -324,6 +357,7 @@
       const notOffCanvas = new bootstrap.Offcanvas('#notificationOC');
       const purgeModel = new bootstrap.Modal("#purgeModel");
       const purgeCountdownDiv = document.getElementById("purge-countdown");
+      const purgeCountdownEndDiv = document.getElementById("purge-end-countdown");
 
       const not_btn = document.getElementById('notification_btn_id');
       
@@ -350,37 +384,73 @@
     <script type="text/javascript">
       purgeModel.show();
 
-      
-      // Set the date we're counting down to (1 month from now)
       const countDownDate = new Date("{{rule_suspension.start_time.isoformat}}").getTime();
+      const countDownEndDate = new Date("{{rule_suspension.end_time.isoformat}}").getTime();
       
-      // Update the countdown every 1 second
-      const x = setInterval(() => {
-        // Get today's date and time
-        const now = new Date().getTime();
+      function getDistance() {
         
-        // Find the distance between now and the countdown date
-        const distance = countDownDate - now;
-        console.log(distance);
+      }
+
+      function startCountdown() {
+        // Update the countdown every 1 second
+        const x = setInterval(() => {
+          // Get today's date and time
+          const now = new Date().getTime();
+          
+          // Find the distance between now and the countdown date
+          const distance = countDownDate - now;
+          console.log(distance);
+          
+          if (distance < 0) {
+            purgeCountdownDiv.style.display = "none";
+            clearInterval(x);
+            return;
+          }
+          purgeCountdownDiv.style.display = "flex";
+          
+          // Time calculations for days, hours, minutes and seconds
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
         
-        if (distance < 0) {
-          purgeCountdownDiv.style.display = "none";
-          clearInterval(x);
-          return;
-        }
-        purgeCountdownDiv.style.display = "flex";
-        
-        // Time calculations for days, hours, minutes and seconds
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          // Display the result
+          document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
+          document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
+          document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, '0');
+        }, 1000);
+      }
+
       
-        // Display the result
-        document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
-        document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
-        document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, '0');
-      }, 1000);
+      function startEndCountdown() {
+        // Update the countdown every 1 second
+        const x2 = setInterval(() => {
+          // Get today's date and time
+          const now = new Date().getTime();
+          
+          // Find the distance between now and the countdown date
+          const distance = countDownEndDate - now;
+          console.log(distance);
+          
+          if (distance < 0) {
+            purgeCountdownEndDiv.style.display = "none";
+            clearInterval(x2);
+            return;
+          }
+          purgeCountdownEndDiv.style.display = "flex";
+          
+          // Time calculations for days, hours, minutes and seconds
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+          // Display the result
+          document.getElementById("hours2").innerHTML = hours.toString().padStart(2, '0');
+          document.getElementById("minutes2").innerHTML = minutes.toString().padStart(2, '0');
+          document.getElementById("seconds2").innerHTML = seconds.toString().padStart(2, '0');
+        }, 1000);
+      }
     </script>
     {% endif %}
 
