@@ -129,6 +129,8 @@ class Kill(models.Model):
 
     date = models.DateField(default=django.utils.timezone.now)
 
+    video_link = models.URLField(max_length=200, null=True)
+
     def get_round(self):
         return self.target.round
 

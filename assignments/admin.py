@@ -45,7 +45,7 @@ class KillAdmin(admin.ModelAdmin):
 
     list_display = ["id", "date", "round", "link_to_target", "elimed_participant_name", "eliminator_name"]
 
-    # fields = ["target", "elimed_participant", "eliminator", "date"]
+    fields = ["elimed_participant", "eliminator", "date", "video_link"]
 
     def get_target(self, obj):
         return obj.target
