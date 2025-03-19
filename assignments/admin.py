@@ -63,7 +63,7 @@ class KillAdmin(admin.ModelAdmin):
     
     def link(self, obj):
         if obj.video_link is not None:
-            return format_html('<a href="{}">{}</a>', obj.video_link, "Link")
+            return format_html('<a href="{}" target="_blank">{}</a>', obj.video_link, "Link")
         return "-"
     
     def round(self, obj):
