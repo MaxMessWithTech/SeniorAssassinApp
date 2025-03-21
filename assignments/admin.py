@@ -38,6 +38,7 @@ class RoundAdmin(admin.ModelAdmin):
 class TargetAdmin(admin.ModelAdmin):
     list_filter = ["round", "target_team", "prosecuting_team"]
     search_fields =  ["round", "eliminations"]
+    list_display = ["round", "eliminations", "target_team", "prosecuting_team"]
 
 @admin.register(Kill)
 class KillAdmin(admin.ModelAdmin):
