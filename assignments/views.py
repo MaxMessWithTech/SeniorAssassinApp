@@ -20,12 +20,22 @@ import random
 
 
 def getCurRound() -> Round:
-	rounds = Round.objects.all()
+	rounds = Round.objects.filter(completed = False)
 
 	for round in rounds: 
 		if round.start_date <= timezone.now() and round.end_date > timezone.now():
 			return round
+	
 	return None
+
+def getNextRound() -> Round:
+	rounds = Round.objects.filter(completed = False).order_by("start_date")
+
+	for round in rounds: 
+		if round.end_date > timezone.now():
+			return round
+	
+	return Round.objects.first()
 
 
 def getCurRuleSuspension () -> RuleSuspension:
@@ -94,6 +104,10 @@ def home(request, team_code):
 		team = Team.objects.get(viewing_code=team_code)
 
 		current_round = getCurRound()
+
+		if current_round is None:
+			current_round = getNextRound()
+
 		current_round_index = current_round.index
 
 	except (KeyError, Team.DoesNotExist):
@@ -192,7 +206,8 @@ def gameStatus(request):
 		current_round = getCurRound()
 
 		if current_round is None:
-			current_round = Round.objects.first()
+			current_round = getNextRound()
+			
 		current_round_index = current_round.index
 
 		round_elims = Participant.objects.filter(round_eliminated=True, eliminated_permanently=False)
@@ -326,21 +341,11 @@ def admin_login_view(request):
 		return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
-@login_required(login_url="/accounts/login/")
-def assignTeamsInRound(request):
-	if request.method != 'POST':
-		return HttpResponseBadRequest("Must be a POST request!")
-	
-	if "round_num" not in request.POST:
-		return HttpResponseBadRequest("missing round_num param!")
-	if "start_date" not in request.POST:
-		return HttpResponseBadRequest("missing start_date param!")
-	if "end_date" not in request.POST:
-		return HttpResponseBadRequest("missing end_date param!")
-	
-	roundNum = int(request.POST["round_num"])
-	startDate = datetime.datetime.fromisoformat(request.POST["start_date"])
-	endDate = datetime.datetime.fromisoformat(request.POST["end_date"])
+# Helper Method
+def create_new_round(round_num, start_date, end_date):	
+	roundNum = int(round_num)
+	startDate = datetime.datetime.fromisoformat(start_date)
+	endDate = datetime.datetime.fromisoformat(end_date)
 
 	existingRounds = Round.objects.filter(index=roundNum)
 
@@ -375,7 +380,25 @@ def assignTeamsInRound(request):
 
 			assignedIDs.append(pairedID)
 			break
-		
+
+
+@login_required(login_url="/accounts/login/")
+def createRound(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest("Must be a POST request!")
+	
+	if "round_num" not in request.POST:
+		return HttpResponseBadRequest("missing round_num param!")
+	if "start_date" not in request.POST:
+		return HttpResponseBadRequest("missing start_date param!")
+	if "end_date" not in request.POST:
+		return HttpResponseBadRequest("missing end_date param!")
+	
+	create_new_round(
+		request.POST["round_num"], 
+		request.POST["start_date"], 
+		request.POST["end_date"]
+	)
 
 	return HttpResponseRedirect(reverse("assignments:admin-control"))
 
@@ -386,7 +409,8 @@ def adminControl(request):
 		current_round = getCurRound()
 
 		if current_round is None:
-			current_round = Round.objects.first()
+			current_round = getNextRound()
+		
 		current_round_index = current_round.index
 
 		round_elims = Participant.objects.filter(round_eliminated=True, eliminated_permanently=False)
@@ -497,6 +521,8 @@ def eliminateParticipant(request):
 
 @login_required(login_url="/accounts/login/")
 def cleanup_round(request):
+	errorTemplate = loader.get_template("assignments/error.html")
+
 	if request.method != 'POST':
 		return HttpResponseBadRequest("Must be a POST request!")
 	
@@ -504,7 +530,9 @@ def cleanup_round(request):
 	round = Round.objects.filter(completed = False).order_by('start_date').first()
 
 	if round is None:
-		return HttpResponseBadRequest("No rounds that haven't already been completed!")
+		return HttpResponse(
+			errorTemplate.render({'message': "No rounds that haven't already been completed!"}, request)
+		)
 	
 	teams = Team.objects.filter(eliminated = False)
 
@@ -534,7 +562,19 @@ def cleanup_round(request):
 
 	round.completed = True
 	round.save()
-	return HttpResponseRedirect(reverse("assignments:admin-control"))
+
+	create_new_round(
+		round_num = round.index + 1,
+		start_date = (round.start_date.date() + timezone.timedelta(days=7)).isoformat(),
+		end_date = (round.end_date.date() + timezone.timedelta(days=7)).isoformat(),
+	)
+	
+	template = loader.get_template("assignments/success.html")
+	context = {
+		'message': 	f"Successfully ended round {round.index}, " +
+					f"then successfully created round {round.index + 1} with new pairings."
+	}
+	return HttpResponse(template.render(context, request))
 
 
 def random_date(start_date:datetime.date, end_date:datetime.date):
