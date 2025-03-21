@@ -32,6 +32,7 @@ class ParticipantAdmin(admin.ModelAdmin):
 class RoundAdmin(admin.ModelAdmin):
     list_filter = ["index"]
     search_fields = ["index", "start_date", "end_date"]
+    list_display = ["index", "start_date", "end_date"]
 
 @admin.register(Target)
 class TargetAdmin(admin.ModelAdmin):

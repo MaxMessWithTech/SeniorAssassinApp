@@ -104,10 +104,6 @@ def home(request, team_code):
 		team = Team.objects.get(viewing_code=team_code)
 
 		current_round = getCurRound()
-
-		if current_round is None:
-			current_round = getNextRound()
-
 		current_round_index = current_round.index
 
 	except (KeyError, Team.DoesNotExist):
@@ -117,9 +113,7 @@ def home(request, team_code):
 	except (AttributeError):
 		dneTemplate = loader.get_template("assignments/roundDNE.html")
 
-		nextRound = Round.objects.all().order_by('start_date').first()
-
-		return HttpResponse(dneTemplate.render({'nextRound': nextRound}, request))
+		return HttpResponse(dneTemplate.render({'nextRound': getNextRound()}, request))
 
 
 	cur_round_targets = Target.objects.filter(round = current_round).filter(prosecuting_team = team)
