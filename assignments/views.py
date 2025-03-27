@@ -479,7 +479,8 @@ def eliminateParticipant(request):
 	)
 	
 	if elimed_participant.round_eliminated or elimed_participant.eliminated_permanently:
-		template = loader.get_template("assignments/failedToKill.html")
+		# template = loader.get_template("assignments/failedToKill.html")
+		template = loader.get_template("assignments/eliminatedParticipant.html")
 		context = {
 			
 		}
@@ -511,6 +512,35 @@ def eliminateParticipant(request):
 	}
 	return HttpResponse(template.render(context, request)) 
 	# return HttpResponseRedirect(reverse("assignments:admin-control"))
+
+
+@login_required(login_url="/accounts/login/")
+def add_drive_url(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest("Must be a POST request!")
+	
+	"""
+	POST PARAMS
+	kill_id, video_url
+	"""
+
+	print(request.POST)
+	
+	if "kill_id" not in request.POST:
+		return HttpResponseBadRequest("missing kill ID param!")
+	if "video_url" not in request.POST:
+		return HttpResponseBadRequest("missing video_url  param!")
+	
+
+	kill = get_object_or_404(Kill, id = request.POST["kill_id"])
+	kill.video_link = request.POST["video_url"]
+	kill.save()
+
+	template = loader.get_template("assignments/success.html")
+	context = {
+		'message': 	f"Successfully added URL!" 
+	}
+	return HttpResponse(template.render(context, request))
 
 
 @login_required(login_url="/accounts/login/")

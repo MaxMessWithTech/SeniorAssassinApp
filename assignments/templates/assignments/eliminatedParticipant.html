@@ -146,6 +146,26 @@
                         <p class="text-center">
                             <strong>Drive Text:</strong> {{drive_text}}
                         </p>
+                        <div class="container bg-light">
+                            <form action="{% url 'assignments:add_drive_url' %}" method="post">
+                                {% csrf_token %}
+
+                                <div class="mb-3">
+                                    <label for="video_url" class="form-label">Drive URL</label>
+                                    <input type="text" class="form-control" id="video_url" name="video_url" placeholder="" />
+                                </div>
+
+                                <input type="hidden" id="kill_id" name="kill_id" value="{{kill.id}}" />
+
+                                <input 
+                                    data-mdb-button-init 
+                                    data-mdb-ripple-init 
+                                    class="btn btn-outline-light btn-lg px-5" 
+                                    type="submit"
+                                    value="Add URL"
+                                />
+                            </form>
+                        </div>
                     </div>
         
                     <div class="modal-footer">

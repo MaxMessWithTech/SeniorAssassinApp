@@ -15,6 +15,7 @@ urlpatterns = [
     path("assign-teams-in-round", views.createRound, name="assign-teams"),
     path("add-things", views.addThings, name="add-things"),
     path("eliminate-participant", views.eliminateParticipant, name="eliminate-participant"),
+    path("add_drive_url", views.add_drive_url, name="add_drive_url"),
     path("cleanup_round", views.cleanup_round, name="cleanup_round"),
     path("create_purge", views.create_purge, name="create_purge"),
     path("admin-control", views.adminControl, name="admin-control"),

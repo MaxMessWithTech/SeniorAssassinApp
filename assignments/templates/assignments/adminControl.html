@@ -406,7 +406,7 @@ Floaties no longer afford ANY protection. Protections for school sanctioned acti
                 if (team.id === target.target_team) {
                     for (let j = 0; j < participants.length; j++) {
                         let participant = participants[j];
-                        if (participant.team === team.id) {
+                        if (participant.team === team.id && participant.round_eliminated === false) {
                             elimArray.push(
                                 '<option id="' + participant.id + '" value="' + participant.id + '">' + participant.name + '</option>'
                             )
@@ -418,7 +418,7 @@ Floaties no longer afford ANY protection. Protections for school sanctioned acti
                     for (let j = 0; j < participants.length; j++) {
                         
                         let participant = participants[j];
-                        if (participant.team === team.id) {
+                        if (participant.team === team.id && participant.round_eliminated === false) {
                             killerArray.push(
                                 '<option id="' + participant.id + '" value="' + participant.id + '">' + participant.name + '</option>'
                             )
