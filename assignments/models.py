@@ -4,6 +4,7 @@ import string
 import django
 from smart_selects.db_fields import ChainedForeignKey
 import math
+from django.utils import timezone
 
 
 class Team(models.Model):
@@ -62,6 +63,25 @@ class Team(models.Model):
 
         return ", ".join(filtered_p)
 
+    def get_round_kills_count(self) -> int:
+
+        target = self.prosecuting_targets.filter(round=getCurRound()).first()
+        
+        kills = target.kills.all()
+        
+        return len(kills)
+    
+
+    def get_total_kills_count(self) -> int:
+
+        counter = 0
+
+        targets = self.prosecuting_targets.all()
+        
+        for target in targets:
+            counter += len(target.kills.all())
+        
+        return counter
 
     def __str__(self):
         return f"{self.id}-{self.name}"
@@ -122,7 +142,7 @@ class Target(models.Model):
 
 
 class Kill(models.Model):
-    target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='target', null=True)
+    target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='kills', null=True)
     
     elimed_participant = models.ForeignKey(Participant, on_delete=models.CASCADE,  related_name='eliminations',  null=True)
     eliminator = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='kills', null=True)
@@ -232,3 +252,13 @@ class Vote(models.Model):
     participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='votes', null=True)
 
     in_favor = models.BooleanField(default=False)
+
+
+def getCurRound() -> Round:
+	rounds = Round.objects.filter(completed = False)
+
+	for round in rounds: 
+		if round.start_date <= timezone.now() and round.end_date > timezone.now():
+			return round
+	
+	return None

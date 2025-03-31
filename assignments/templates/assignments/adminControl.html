@@ -67,19 +67,29 @@
                             <ul class="list-group">
                                 {% for team in teams %}
                                     
-                                <li class="list-group-item d-flex justify-content-between align-items-start">
-                                    <div class="ms-2 me-auto text-start">
-                                        <div class="fw-bold">Team: {{team.name}}</div>
-                                        <ul class="list-group">
-                                            {% for p in team.get_participants %}
-                                                <li style="color: {{p.get_color}};">{{p.name}}</li>
-                                            {% endfor %}
-                                        </ul>
-                                        <a class="btn btn-primary" href="/home/{{team.viewing_code}}" role="button">Open</a>
-                                    </div>
-                                    <span class="badge bg-danger rounded-pill">{{team.get_perm_elimed_count}}</span>
-                                    <span class="badge bg-warning text-dark rounded-pill">{{team.get_round_elimed_count}}</span>
-                                    <span class="badge bg-success rounded-pill">{{team.get_remaining_count}}</span>
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div class="ms-2 me-auto text-start">
+                                            <div class="d-flex flex-row">
+                                                <div class="fw-bold">Team: {{team.name}}</div>
+                                                <div>
+                                                    <span class="badge bg-danger rounded-pill" style="margin-left: 1rem;">
+                                                        Round Kills: {{team.get_round_kills_count}}
+                                                    </span>
+                                                    <span class="badge bg-danger rounded-pill" style="margin-left: 1rem;">
+                                                        Total Kills: {{team.get_total_kills_count}}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <ul class="list-group">
+                                                {% for p in team.get_participants %}
+                                                    <li style="color: {{p.get_color}};">{{p.name}}</li>
+                                                {% endfor %}
+                                            </ul>
+                                            <a class="btn btn-primary mb-2" href="/home/{{team.viewing_code}}" role="button">Open</a>
+                                        </div>
+                                        <span class="badge bg-danger rounded-pill">{{team.get_perm_elimed_count}}</span>
+                                        <span class="badge bg-warning text-dark rounded-pill">{{team.get_round_elimed_count}}</span>
+                                        <span class="badge bg-success rounded-pill">{{team.get_remaining_count}}</span>
                                     </li>
                                 {% endfor %}
                             </ul>
