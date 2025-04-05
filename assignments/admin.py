@@ -27,6 +27,10 @@ class TeamAdmin(admin.ModelAdmin):
 def revive_participant(modeladmin, request, queryset):
     queryset.update(round_eliminated=False, eliminated_permanently=False)
 
+@admin.action(description="Permanently Eliminate")
+def perm_elim_participant(modeladmin, request, queryset):
+    queryset.update(round_eliminated=True, eliminated_permanently=True)
+
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
     list_filter = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
@@ -34,7 +38,7 @@ class ParticipantAdmin(admin.ModelAdmin):
     fields = ["name", "team", "round_eliminated", "eliminated_permanently"]
     list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
 
-    actions = [revive_participant]
+    actions = [revive_participant, perm_elim_participant]
 
 
 @admin.register(Round)
