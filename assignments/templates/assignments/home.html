@@ -7,6 +7,7 @@
         {% bootstrap_css %}
         {% bootstrap_javascript %}
         {% load static %}
+        {% load list_format %}
 
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -184,7 +185,7 @@
                   <div class="mb-md-5 mt-md-4 pb-5">
       
                     <h2 class="fw-bold mb-2 text-uppercase text-lg-left">Welcome</h2>
-                    <p class="text-white-50" style="margin-bottom: 3rem">Team: {{team_name}}</p>
+                    <p class="text-white-50" style="margin-bottom: 3rem">Team: {{team.name}}</p>
 
 
                     <ul class="list-group">
@@ -194,17 +195,17 @@
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
                         <div class="fw-bold">Current Target Team</div>
-                        {{target_name}}
+                        {{target_team.name}}
                       </li>
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
                         <div class="fw-bold">Target Team Members</div>
-                        {{target_participants}}
+                        {{target_team.get_remaining|query_to_list}}
                       </li>
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
-                        <div class="fw-bold">Eliminated</div>
-                        {{elimed_targets}}
+                        <div class="fw-bold">Eliminations your team has made</div>
+                        {{target_team.get_round_elimed|query_to_list}}
                       </li>
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
@@ -237,17 +238,17 @@
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
                         <div class="fw-bold">Team Members Remaining</div>
-                        {{remaining_members}}
+                        {{team.get_remaining|query_to_list}}
                       </li>
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
                         <div class="fw-bold">Eliminated This Round</div>
-                        {{roundElimedTeam}}
+                        {{team.get_round_elimed|query_to_list}}
                       </li>
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
                         <div class="fw-bold">Eliminated Permanently</div>
-                        {{permElimedTeam}}
+                        {{team.get_perm_elimed|query_to_list}}
                       </li>
 
                     </ul>

@@ -174,13 +174,16 @@ def home(request, team_code):
 		'current_round_index': current_round_index,
 		'cur_round_start': current_round.start_date,
 		'cur_round_end': current_round.end_date,
-		'target_participants': ', '.join(target_participants),
-		'elimed_targets':  ', '.join(elimed_targets),
-		'target_name': cur_target.target_team.name,
+		# 'target_participants': ', '.join(target_participants),
+		'target_team': cur_target.target_team,
+		'team': team,
+
+		# 'elimed_targets':  ', '.join(elimed_targets),
+		# 'target_name': cur_target.target_team.name,
 		'notifications': notifications,
-		'remaining_members': ', '.join(remainingMembers),
-		'roundElimedTeam': ', '.join(roundElimedTeam),
-		'permElimedTeam': ', '.join(permElimedTeam),
+		# 'remaining_members': ', '.join(remainingMembers),
+		# 'roundElimedTeam': ', '.join(roundElimedTeam),
+		# 'permElimedTeam': ', '.join(permElimedTeam),
 		'cur_target':cur_target,
 		'rule_suspension': ruleSuspension
 
@@ -352,17 +355,21 @@ def create_new_round(round_num, start_date, end_date):
 	
 	# Make random assignments
 	teams = Team.objects.filter(eliminated=False)
+	all_ids = list()
+
+	for team in teams:
+		all_ids.append(team.id)
 
 	assignedIDs = list()
 
 	for team in teams:
 		while True:
-			pairedID = random.randint(1, len(teams))
-			if pairedID in assignedIDs:
+			pairedID = random.randint(0, len(all_ids) - 1)
+			if pairedID in assignedIDs or all_ids[pairedID] == team.id:
 				continue
 
 
-			targetTeam = Team.objects.filter(id=pairedID).first()
+			targetTeam = Team.objects.filter(id=all_ids[pairedID]).first()
 
 			target = Target(
 				round=round, 
@@ -561,28 +568,10 @@ def cleanup_round(request):
 	teams = Team.objects.filter(eliminated = False)
 
 	for team in teams:
-		# Get Number of kills that the team has gotten
-		roundProsecutingTarget = team.prosecuting_targets.filter(round=round).first()
-		if roundProsecutingTarget.eliminations >= 2:
-			# Revive all round eliminated team members
-			ps = team.participants.filter(eliminated_permanently=False).filter(round_eliminated=True)
-
-			for p in ps:
-				p.round_eliminated = False
-				p.save()
+		if team.will_progress_in_round():
+			team.try_revive()
 		else:
-			# Permanently eliminate all round eliminated team members
-			ps = team.participants.filter(eliminated_permanently=False).filter(round_eliminated=True)
-
-			for p in ps:
-				p.eliminated_permanently = True
-				p.save()
-
-			remaining_members = team.participants.filter(eliminated_permanently=False).filter(round_eliminated=False)
-			if len(remaining_members) == 0:
-				team.eliminated = True
-				team.eliminated_date = timezone.now()
-				team.save()
+			team.eliminate()
 
 	round.completed = True
 	round.save()

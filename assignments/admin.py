@@ -2,9 +2,16 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models import Team, Participant, Round, Target, Kill, RuleSuspension, Issue, Vote
+from .models import Team, Participant, Round
+from .models import Target, Kill, RuleSuspension, Issue, Vote
+from .models import ProgressionOverride
 
 # Cookbook: https://books.agiliq.com/projects/django-admin-cookbook/en/latest/export.html
+
+@admin.action(description="Revive Team")
+def revive_team(modeladmin, request, queryset):
+    queryset.update(eliminated=False)
+
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
@@ -13,6 +20,8 @@ class TeamAdmin(admin.ModelAdmin):
 
     fields = ["name", "eliminated", "viewing_code"]
     list_display = ["id", "name", "eliminated", "viewing_code"]
+
+    actions = [revive_team]
 
 @admin.action(description="Revive Participant")
 def revive_participant(modeladmin, request, queryset):
@@ -135,6 +144,14 @@ class VoteAdmin(admin.ModelAdmin):
     list_display = ["issue", "team", "participant", "in_favor"]
 
     # fields = ["target", "elimed_participant", "eliminator", "date"]
+
+
+@admin.register(ProgressionOverride)
+class ProgressionOverrideAdmin(admin.ModelAdmin):
+    pass
+
+    # fields = ["target", "elimed_participant", "eliminator", "date"]
+
 
 
 admin.site.site_header = "SA Admin"

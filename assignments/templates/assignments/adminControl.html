@@ -6,8 +6,6 @@
         {% load bootstrap5 %}
         {% bootstrap_css %}
         {% bootstrap_javascript %}
-        {% load math_filters %}
-        {% load target_filters %}
         {% load static %}
 
         <meta charset="UTF-8">
@@ -70,7 +68,13 @@
                                     <li class="list-group-item d-flex justify-content-between align-items-start">
                                         <div class="ms-2 me-auto text-start">
                                             <div class="d-flex flex-row">
+                                                {% if team.will_progress_in_round %}
+                                                <div class="fw-bold text-success">Team: {{team.name}}</div>
+                                                {% elif team.eliminated %}
+                                                <div class="fw-bold text-danger">Team: {{team.name}}</div>
+                                                {% else %}
                                                 <div class="fw-bold">Team: {{team.name}}</div>
+                                                {% endif %}
                                                 <div>
                                                     <span class="badge bg-danger rounded-pill" style="margin-left: 1rem;">
                                                         Round Kills: {{team.get_round_kills_count}}
