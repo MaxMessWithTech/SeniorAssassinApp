@@ -348,6 +348,9 @@ class ProgressionOverride(models.Model):
 
 	issued_date = models.DateTimeField(default=django.utils.timezone.now)
 
+	def __str__(self):
+		return f"Round {self.round.index} Override for {self.team.name}"
+
 
 def getCurRound() -> Round:
 	rounds = Round.objects.filter(completed = False)
