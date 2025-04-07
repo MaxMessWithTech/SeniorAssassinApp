@@ -118,7 +118,7 @@ def home(request, team_code):
 	if team.eliminated:
 		errorTemplate = loader.get_template("assignments/error.html")
 		return HttpResponse(
-			errorTemplate.render({'message': "You're team has been eliminated from the game!"}, request)
+			errorTemplate.render({'message': "Your team has been eliminated from the game!"}, request)
 		)
 
 	cur_round_targets = Target.objects.filter(round = current_round).filter(prosecuting_team = team)
