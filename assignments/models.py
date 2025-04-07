@@ -5,6 +5,7 @@ import django
 from smart_selects.db_fields import ChainedForeignKey
 import math
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 
 class Team(models.Model):
@@ -13,6 +14,9 @@ class Team(models.Model):
 
 	eliminated = models.BooleanField(default=False)
 	eliminated_date=models.DateField(null=True, blank=True)
+
+	history = HistoricalRecords()
+
 
 	def generate_viewing_code() -> str:
 		return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
@@ -129,7 +133,7 @@ class Team(models.Model):
 			return True
 		
 		# Permanently eliminate all round eliminated team members
-		ps = self.get_perm_elimed()
+		ps = self.get_round_elimed()
 
 		for p in ps:
 			p.eliminated_permanently = True
@@ -172,6 +176,8 @@ class Participant(models.Model):
 	name = models.CharField(max_length=200)
 	team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="participants")
 
+	history = HistoricalRecords()
+
 	# A participant can be eliminated in a round and then revived 
 	# if their team eliminates 3 people on the team they're matched against
 	round_eliminated = models.BooleanField(default=False)
@@ -210,6 +216,8 @@ class Round(models.Model):
 
 	completed = models.BooleanField(default=False)
 
+	history = HistoricalRecords()
+
 	def get_start_date_str(self):
 		return self.start_date.strftime("%m/%d")
 
@@ -224,6 +232,9 @@ class Target(models.Model):
 	
 	eliminations = models.IntegerField(default=0)
 
+	history = HistoricalRecords()
+
+
 	def __str__(self):
 		return f"Round {self.round.index} target of {self.target_team.name} by {self.prosecuting_team.name}"
 
@@ -237,6 +248,9 @@ class Kill(models.Model):
 	date = models.DateField(default=django.utils.timezone.now)
 
 	video_link = models.URLField(max_length=200, null=True)
+
+	history = HistoricalRecords()
+
 
 	def get_round(self):
 		return self.target.round
@@ -266,6 +280,8 @@ class RuleSuspension(models.Model):
 	start_time = models.DateTimeField()
 	end_time = models.DateTimeField()
 
+	history = HistoricalRecords()
+
 
 class Issue(models.Model):
 	label = models.CharField(max_length=100)
@@ -274,6 +290,8 @@ class Issue(models.Model):
 	team_vote = models.BooleanField(default=False)
 
 	closed = models.BooleanField(default=False)
+
+	history = HistoricalRecords()
 
 	def get_for_votes(self):
 		votes = self.votes.filter(in_favor=True)
@@ -340,6 +358,8 @@ class Vote(models.Model):
 
 	in_favor = models.BooleanField(default=False)
 
+	history = HistoricalRecords()
+
 
 class ProgressionOverride(models.Model):
 	id = models.IntegerField(primary_key=True)
@@ -347,6 +367,9 @@ class ProgressionOverride(models.Model):
 	team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='pro_overrides')
 
 	issued_date = models.DateTimeField(default=django.utils.timezone.now)
+
+	history = HistoricalRecords()
+
 
 	def __str__(self):
 		return f"Round {self.round.index} Override for {self.team.name}"

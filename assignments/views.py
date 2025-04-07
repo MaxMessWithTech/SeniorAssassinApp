@@ -18,6 +18,8 @@ import assignments.handleCSV as handleCSV
 from dal import autocomplete
 import random
 
+from assignments.notifications import Notifications
+
 
 def getCurRound() -> Round:
 	rounds = Round.objects.filter(completed = False)
@@ -98,8 +100,6 @@ def login_view(request):
 		return HttpResponseRedirect(reverse("assignments:home", args=(team.viewing_code,)))
 
 def home(request, team_code):
-	# latest_question_list = Question.objects.order_by("-pub_date")[:5]
-	
 	try:
 		team = Team.objects.get(viewing_code=team_code)
 
@@ -128,50 +128,17 @@ def home(request, team_code):
 
 	cur_target = cur_round_targets[0]
 
-	# Get target participants
-	target_participant_objs = Participant.objects.filter(team=cur_target.target_team).filter(eliminated_permanently=False)
-	target_participants = convertQueryToNameList(target_participant_objs)
+	# NOTIFICATIONS
 
-	# Get Eliminated Targets
-	eliminated_targets = target_participant_objs.filter(round_eliminated=True)
-	elimed_targets = convertQueryToNameList(eliminated_targets)
-
-
-	# Get Remaining Team Members
-	remainingMembersObjs = Participant.objects.filter(team=team).filter(round_eliminated=False).filter(eliminated_permanently=False)
-	remainingMembers = convertQueryToNameList(remainingMembersObjs)
-
-	# Get Round Elimed Team Members
-	roundElimedMembersObjs = Participant.objects.filter(team=team).filter(round_eliminated=True).filter(eliminated_permanently=False)
-	roundElimedTeam = convertQueryToNameList(roundElimedMembersObjs)
-
-	# Get Perm Elimed Team Members
-	permElimedObjs = Participant.objects.filter(team=team).filter(eliminated_permanently=True)
-	permElimedTeam = convertQueryToNameList(permElimedObjs)
+	notifications = Notifications()
+	notifications.addKills( kills=Kill.objects.filter(target=cur_target) )
+	notifications.addIssues( issues = Issue.objects.filter(closed=False), team_code=team_code )
+	notifications.addStatus()
 	
-
-	notifications = list()
-
-	kills = Kill.objects.filter(target=cur_target)
-	
-	for kill in kills:
-		timedelta = kill.date - timezone.now().date()
-		if timedelta.days <= 7: 
-			notifications.append({
-				"header": "New Kill",
-				"body": f"{kill.eliminator.name} killed {kill.elimed_participant.name} on {kill.date.strftime('%B %d')}",
-				"link": None
-			})
-
-	for issue in Issue.objects.filter(closed=False):
-		notifications.append({
-			"header": "New Vote",
-			"body": f"{issue.label}. For: {issue.get_for_votes()}, against: {issue.get_against_votes()}, required to pass: {issue.get_majority()}",
-			"link": f"/vote/{team_code}/{issue.id}"	
-		})
-
+	# RULE SUSPENSION
 	ruleSuspension = getCurRuleSuspension()
 
+	# TEMPLATE RETURN
 	template = loader.get_template("assignments/home.html")
 	context = {
 		'team_code': team.viewing_code,
@@ -179,16 +146,12 @@ def home(request, team_code):
 		'current_round_index': current_round_index,
 		'cur_round_start': current_round.start_date,
 		'cur_round_end': current_round.end_date,
-		# 'target_participants': ', '.join(target_participants),
+
 		'target_team': cur_target.target_team,
 		'team': team,
 
-		# 'elimed_targets':  ', '.join(elimed_targets),
-		# 'target_name': cur_target.target_team.name,
-		'notifications': notifications,
-		# 'remaining_members': ', '.join(remainingMembers),
-		# 'roundElimedTeam': ', '.join(roundElimedTeam),
-		# 'permElimedTeam': ', '.join(permElimedTeam),
+		'notifications': notifications.get(),
+
 		'cur_target':cur_target,
 		'rule_suspension': ruleSuspension
 
@@ -230,7 +193,7 @@ def gameStatus(request):
 		round_target_list.append(model_to_dict(target))
 
 
-	all_teams = Team.objects.all()
+	all_teams = Team.objects.filter(eliminated=False)
 	team_list = list()
 	for team in all_teams:
 		team_list.append(model_to_dict(team))

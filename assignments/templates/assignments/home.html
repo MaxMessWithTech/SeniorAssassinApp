@@ -282,7 +282,7 @@
               <h5>{{ not.header }}</h5>
               {{ not.body }}
               {% if not.link is not None %}
-              <a class="btn btn-primary" href="{{not.link}}" role="button">Vote</a>
+              <a class="btn btn-primary" href="{{not.link}}" role="button">{{not.link_text}}</a>
               {% endif %}
               </li>
             {% endfor %}
