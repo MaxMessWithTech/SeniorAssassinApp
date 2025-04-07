@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
+from django.db.models import Q
 
 from .models import Team, Participant, Round
 from .models import Target, Kill, RuleSuspension, Issue, Vote
@@ -55,8 +56,8 @@ class TargetAdmin(admin.ModelAdmin):
 
 @admin.register(Kill)
 class KillAdmin(admin.ModelAdmin):
-    list_filter = ["target", "elimed_participant", "eliminator"]
-    search_fields =  ["date"]
+    list_filter = ["target__round", "elimed_participant__name", "eliminator__name"]
+    search_fields =  ["date", "elimed_participant__name", "eliminator__name"]
 
     list_display = ["id", "date", "round", "link_to_target", "elimed_participant_name", "eliminator_name", "link"]
 
@@ -85,12 +86,26 @@ class KillAdmin(admin.ModelAdmin):
         link = reverse("admin:assignments_round_change", args=[obj.target.round.id])
         return format_html('<a href="{}">{}</a>', link, obj.target.round.index)
     
+    # WITH LINK
     def elimed_participant_name(self, obj):
         return self.link_to_participant(obj.elimed_participant)
     
+    # WITH LINK
     def eliminator_name(self, obj):
         return self.link_to_participant(obj.eliminator)
     
+    # NO LINK
+    def get_elimed_name(self, obj):
+        print(obj.elimed_participant.name)
+        return obj.elimed_participant.name
+    get_elimed_name.short_description = 'Eliminated Participant Name'
+
+    
+    # NO LINK
+    def get_eliminator_name(self, obj):
+        return obj.eliminator.name
+    
+
     link_to_target.short_description = "target"
     round.short_description = "round"
     elimed_participant_name.short_description = "eliminated"
@@ -109,6 +124,7 @@ class KillAdmin(admin.ModelAdmin):
                 # kwargs['queryset'] = Participant.objects.all()
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
     
+    # OVERRIDE
     def clean(self):
         target = self.target
         elimed_participant = self.elimed_participant
