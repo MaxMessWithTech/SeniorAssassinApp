@@ -358,12 +358,12 @@ def adminControl(request):
 		round_target_list.append(model_to_dict(target))
 
 
-	all_teams = Team.objects.all().order_by("id")
+	all_teams = Team.objects.filter(eliminated=False).order_by("id")
 	team_list = list()
 	for team in all_teams:
 		team_list.append(model_to_dict(team))
 
-	participants = Participant.objects.all().order_by("team_id")
+	participants = Participant.objects.filter(eliminated_permanently=False).order_by("team_id")
 	participant_list = list()
 	for participant in participants:
 		participant_list.append(model_to_dict(participant))
