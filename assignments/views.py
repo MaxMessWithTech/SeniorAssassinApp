@@ -20,6 +20,8 @@ import random
 
 from assignments.notifications import Notifications
 
+from assignments import roundManager
+
 
 def getCurRound() -> Round:
 	rounds = Round.objects.filter(completed = False)
@@ -187,7 +189,7 @@ def gameStatus(request):
 		perm_elims = []
 		remaining = []
 	
-	round_targets = Target.objects.filter(round=current_round)
+	round_targets = Target.objects.filter(round=current_round).order_by("id")
 	round_target_list = list()
 	for target in round_targets:
 		round_target_list.append(model_to_dict(target))
@@ -306,51 +308,6 @@ def admin_login_view(request):
 		return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
-# Helper Method
-def create_new_round(round_num, start_date, end_date):	
-	roundNum = int(round_num)
-	startDate = datetime.datetime.fromisoformat(start_date)
-	endDate = datetime.datetime.fromisoformat(end_date)
-
-	existingRounds = Round.objects.filter(index=roundNum)
-
-	if len(existingRounds) != 0:
-		for oldRound in existingRounds:
-			oldRound.delete()
-
-	round = Round(index=roundNum, start_date=startDate, end_date=endDate)
-	round.save()
-	
-	# Make random assignments
-	teams = Team.objects.filter(eliminated=False)
-	all_ids = list()
-
-	for team in teams:
-		all_ids.append(team.id)
-
-	assignedIDs = list()
-
-	for team in teams:
-		while True:
-			pairedID = random.randint(0, len(all_ids) - 1)
-			if pairedID in assignedIDs or all_ids[pairedID] == team.id:
-				continue
-
-
-			targetTeam = Team.objects.filter(id=all_ids[pairedID]).first()
-
-			target = Target(
-				round=round, 
-				target_team=targetTeam, 
-				prosecuting_team=team, 
-				eliminations=0
-			)
-			target.save()
-
-			assignedIDs.append(pairedID)
-			break
-
-
 @login_required(login_url="/accounts/login/")
 def createRound(request):
 	if request.method != 'POST':
@@ -363,7 +320,7 @@ def createRound(request):
 	if "end_date" not in request.POST:
 		return HttpResponseBadRequest("missing end_date param!")
 	
-	create_new_round(
+	roundManager.create_new_round(
 		request.POST["round_num"], 
 		request.POST["start_date"], 
 		request.POST["end_date"]
@@ -372,6 +329,7 @@ def createRound(request):
 	return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
+# MAIN VIEW
 @login_required(login_url="/accounts/login/")
 def adminControl(request):
 	try:
@@ -394,18 +352,18 @@ def adminControl(request):
 		perm_elims = []
 		remaining = []
 	
-	round_targets = Target.objects.filter(round=current_round)
+	round_targets = Target.objects.filter(round=current_round).order_by("id")
 	round_target_list = list()
 	for target in round_targets:
 		round_target_list.append(model_to_dict(target))
 
 
-	all_teams = Team.objects.all()
+	all_teams = Team.objects.all().order_by("id")
 	team_list = list()
 	for team in all_teams:
 		team_list.append(model_to_dict(team))
 
-	participants = Participant.objects.all()
+	participants = Participant.objects.all().order_by("team_id")
 	participant_list = list()
 	for participant in participants:
 		participant_list.append(model_to_dict(participant))
@@ -544,7 +502,7 @@ def cleanup_round(request):
 	round.completed = True
 	round.save()
 
-	create_new_round(
+	roundManager.create_new_round(
 		round_num = round.index + 1,
 		start_date = (round.start_date.date() + timezone.timedelta(days=7)).isoformat(),
 		end_date = (round.end_date.date() + timezone.timedelta(days=7)).isoformat(),
