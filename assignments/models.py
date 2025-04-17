@@ -24,6 +24,9 @@ class Team(models.Model):
 	viewing_code = models.CharField(max_length=8, default=generate_viewing_code, unique=True)
 	
 
+	def get_cur_targets(self) -> list:
+		return self.prosecuting_targets.filter(round=getCurRound())
+
 	# Get participants who have been round eliminated
 	def get_round_elimed(self) -> list:
 		if self.eliminated:
@@ -100,7 +103,7 @@ class Team(models.Model):
 			return -1
 
 		try:
-			target = self.prosecuting_targets.filter(round=getCurRound()).first()
+			target = self.get_cur_targets().first()
 			
 			kills = target.kills.all()
 		except:
@@ -120,16 +123,28 @@ class Team(models.Model):
 		return counter
 
 
+	def revive(self):
+		# Revive team members eliminated this round
+		ps = self.get_round_elimed()
+
+		# For person in people
+		for p in ps:
+			p.round_eliminated = False
+			p.save()
+
+
 	def try_revive(self) -> bool:
 		if self.get_round_kills_count() >= getCurRound().min_revive_kill_count:
-			# Revive team members eliminated this round
-			ps = self.get_round_elimed()
-
-			# For person in people
-			for p in ps:
-				p.round_eliminated = False
-				p.save()
-
+			self.revive()
+			return True
+		
+		target = self.get_cur_targets().first()
+		target_team = target.target_team
+		i = target_team.get_remaining_count() + target_team.get_round_elimed_count()
+		
+		# Met minium of 2/3 of team eliminated instead of the min_revive_kill_count
+		if self.get_round_kills_count() >= math.ceil(i * (2/3)):
+			self.revive()
 			return True
 		
 		# Permanently eliminate all round eliminated team members

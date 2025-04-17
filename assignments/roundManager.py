@@ -65,6 +65,14 @@ def make_layer_pairing(round:Round, teams:list[Team]) -> list[Target]:
 
 # Allows for each team to receive multiple pairings
 def make_multi_pairings(round:Round, depth:int):
+
+	"""
+	Algorithm Rules
+	1) 	A prosecuting team cannot have multiple targets of the same team
+	2) 	Shoot for the same number of target participants 
+		between the same number of targets
+	"""
+
 	teams_filter = Team.objects.filter(eliminated=False)
 
 	teams = list()
