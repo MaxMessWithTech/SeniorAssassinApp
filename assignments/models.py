@@ -186,6 +186,11 @@ class Team(models.Model):
 		self.eliminated_date = timezone.now()
 		self.save()
 
+		for p in self.get_participants():
+			p.round_eliminated = True
+			p.eliminated_permanently = True
+			p.save()
+
 		
 
 	def __str__(self):
