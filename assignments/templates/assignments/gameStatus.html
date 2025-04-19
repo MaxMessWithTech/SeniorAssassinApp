@@ -49,9 +49,7 @@
 
             <div style="background: white; border-radius: .25rem; padding: 1rem;">
                 <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <h4>Kills this round</h4>
-                    </li>
+                    <h4>Kills this round</h4>
                     {% for kill in round_kills %}
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <p><strong>{{kill.id}}:</strong> {{kill}}</p>
@@ -65,31 +63,33 @@
 
             <br />
             
-            <ul class="list-group">
-                <h4>Remaining Teams</h4>
-                <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <span class="badge bg-danger rounded-pill">Permanently Eliminated</span>
-                    <span class="badge bg-warning text-dark rounded-pill">Round Eliminated</span>
-                    <span class="badge bg-success rounded-pill">Remaining</span>
-                </li>
-
-                {% for team in teams %}
-                    
-                <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto text-start">
-                        <div class="fw-bold">Team: {{team.name}}</div>
-                        <ul class="list-group">
-                            {% for p in team.get_participants %}
-                                <li style="color: {{p.get_color}};">{{p.name}}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <span class="badge bg-danger rounded-pill">{{team.get_perm_elimed_count}}</span>
-                    <span class="badge bg-warning text-dark rounded-pill">{{team.get_round_elimed_count}}</span>
-                    <span class="badge bg-success rounded-pill">{{team.get_remaining_count}}</span>
+            <div style="background: white; border-radius: .25rem; padding: 1rem;">
+                <ul class="list-group">
+                    <h4>Remaining Teams</h4>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <span class="badge bg-danger rounded-pill">Permanently Eliminated</span>
+                        <span class="badge bg-warning text-dark rounded-pill">Round Eliminated</span>
+                        <span class="badge bg-success rounded-pill">Remaining</span>
                     </li>
-                {% endfor %}
-            </ul>
+
+                    {% for team in teams %}
+                        
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto text-start">
+                            <div class="fw-bold">Team: {{team.name}}</div>
+                            <ul class="list-group">
+                                {% for p in team.get_participants %}
+                                    <li style="color: {{p.get_color}};">{{p.name}}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <span class="badge bg-danger rounded-pill">{{team.get_perm_elimed_count}}</span>
+                        <span class="badge bg-warning text-dark rounded-pill">{{team.get_round_elimed_count}}</span>
+                        <span class="badge bg-success rounded-pill">{{team.get_remaining_count}}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
         </div>
         </div>
