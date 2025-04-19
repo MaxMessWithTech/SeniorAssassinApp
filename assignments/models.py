@@ -146,6 +146,11 @@ class Team(models.Model):
 		if self.get_round_kills_count() >= math.ceil(i * (2/3)):
 			self.revive()
 			return True
+			
+		
+
+		if self.get_round_kills_count() >= getCurRound().min_progression_kill_count:
+			return False
 		
 		# Permanently eliminate all round eliminated team members
 		ps = self.get_round_elimed()

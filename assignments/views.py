@@ -504,7 +504,7 @@ def cleanup_round(request):
 
 	roundManager.create_new_round(
 		round_num = round.index + 1,
-		start_date = (round.start_date.date() + timezone.timedelta(days=7)).isoformat(),
+		start_date = round.end_date.date().isoformat(),
 		end_date = (round.end_date.date() + timezone.timedelta(days=7)).isoformat(),
 	)
 	

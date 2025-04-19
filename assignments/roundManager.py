@@ -7,21 +7,21 @@ import random
 # Makes 1 to 1 pairings for a round
 def make_direct_pairings(round:Round):
 	teams = Team.objects.filter(eliminated=False)
-	all_ids = list()
+	remaining_ids = list()
 
 	for team in teams:
-		all_ids.append(team.id)
-
-	assignedIDs = list()
+		remaining_ids.append(team.id)
 
 	for team in teams:
 		while True:
-			pairedID = random.randint(0, len(all_ids) - 1)
-			if pairedID in assignedIDs or all_ids[pairedID] == team.id:
+			index = random.randint(0, len(remaining_ids) - 1)
+			selectedID = remaining_ids[index]
+
+			if selectedID == team.id:
 				continue
 
 
-			targetTeam = Team.objects.filter(id=all_ids[pairedID]).first()
+			targetTeam = Team.objects.filter(id=selectedID).first()
 
 			target = Target(
 				round=round, 
@@ -31,7 +31,7 @@ def make_direct_pairings(round:Round):
 			)
 			target.save()
 
-			assignedIDs.append(pairedID)
+			remaining_ids.remove(selectedID)
 			break
 
 
