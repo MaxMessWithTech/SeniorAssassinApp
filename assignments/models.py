@@ -98,18 +98,29 @@ class Team(models.Model):
 		return ", ".join(filtered_p)
 
 	# Get # of kills this round
+	def get_round_kills(self) -> list:
+		try:
+			kills = list()
+			for target in self.get_cur_targets().all():
+				for kill in target.kills.all():
+
+					kills.append(kill.elimed_participant)
+			
+			return kills
+		except:
+			return []
+
+	# Get # of kills this round
 	def get_round_kills_count(self) -> int:
 		if self.eliminated:
 			return -1
 
 		try:
-			target = self.get_cur_targets().first()
-			
-			kills = target.kills.all()
+			kills = self.get_round_kills()
+			return len(kills)
 		except:
 			return -1
 		
-		return len(kills)
 	
 	# Get # of kills during the entire game
 	def get_total_kills_count(self) -> int:
@@ -177,6 +188,8 @@ class Team(models.Model):
 		
 		if self.get_round_kills_count() >= cur_round.min_progression_kill_count:
 			return True
+		
+		print(f"Team {self.name} will not progress because {self.get_round_kills_count()} < {cur_round.min_progression_kill_count}")
 		
 		return False
 	

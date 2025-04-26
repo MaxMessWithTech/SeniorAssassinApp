@@ -35,6 +35,20 @@ def make_direct_pairings(round:Round):
 			break
 
 
+def make_all_pairings(round:Round):
+	teams = Team.objects.filter(eliminated=False)
+
+	for pro_team in teams:
+		for tar_team in teams:
+			target = Target(
+				round=round, 
+				target_team=tar_team, 
+				prosecuting_team=pro_team, 
+				eliminations=0
+			)
+			target.save()
+
+
 # Helper Method for make_multi_pairings
 def make_layer_pairing(round:Round, teams:list[Team]) -> list[Target]:
 	teams = teams.copy()
@@ -86,7 +100,11 @@ def make_multi_pairings(round:Round, depth:int):
 
 
 # Helper Method
-def create_new_round(round_num, start_date, end_date):	
+def create_new_round(
+		round_num:str, start_date:str, end_date:str, 
+		prog_kills:int, rev_kills:int, 
+		direct_pairings:bool
+	) -> Round:	
 	roundNum = int(round_num)
 	startDate = datetime.datetime.fromisoformat(start_date)
 	endDate = datetime.datetime.fromisoformat(end_date)
@@ -97,8 +115,17 @@ def create_new_round(round_num, start_date, end_date):
 		for oldRound in existingRounds:
 			oldRound.delete()
 
-	round = Round(index=roundNum, start_date=startDate, end_date=endDate)
+	round = Round(
+		index=roundNum, start_date=startDate, end_date=endDate,
+		min_progression_kill_count = prog_kills, 
+		min_revive_kill_count = rev_kills
+	)
 	round.save()
 	
 	# Make random assignments
-	make_direct_pairings(round=round)
+	if direct_pairings:
+		make_direct_pairings(round=round)
+	else:
+		make_all_pairings(round=round)
+
+	return round

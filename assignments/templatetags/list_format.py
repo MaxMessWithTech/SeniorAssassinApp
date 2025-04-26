@@ -8,6 +8,7 @@ def list_formatting(value):
 
 @register.filter(name='query_to_list')
 def convertQueryToNameList(query) -> list:
+
 	out = list()
 
 	for p in query:

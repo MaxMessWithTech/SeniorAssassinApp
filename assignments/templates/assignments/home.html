@@ -194,18 +194,23 @@
                       </li>
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
-                        <div class="fw-bold">Current Target Team</div>
-                        {{target_team.name}}
+                        <div class="fw-bold">Current Target Teams</div>
+                        {% for target in cur_targets %}
+                        {{target.target_team.name}}
+                        {% endfor %}
                       </li>
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
                         <div class="fw-bold">Target Team Members</div>
-                        {{target_team.get_remaining|query_to_list}}
+                        {% for target in cur_targets %}
+                        {{target.target_team.get_remaining|query_to_list}}
+                        <br/>
+                        {% endfor %}
                       </li>
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">
                         <div class="fw-bold">Eliminations your team has made</div>
-                        {{target_team.get_round_elimed|query_to_list}}
+                        {{team.get_round_kills|query_to_list}}
                       </li>
 
                       <li class="list-group-item d-flex flex-column justify-content-between align-items-start">

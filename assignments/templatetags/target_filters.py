@@ -5,7 +5,8 @@ register = template.Library()
 @register.filter(name='target_remaining')
 def targetRemaining(all_p):
 
-    print(all_p)
+    if len(filtered_p) == 0:
+        return ""
 
     filtered_p = list()
 

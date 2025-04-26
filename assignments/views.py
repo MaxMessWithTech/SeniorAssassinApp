@@ -125,15 +125,14 @@ def home(request, team_code):
 
 	cur_round_targets = Target.objects.filter(round = current_round).filter(prosecuting_team = team)
 
-	if len(cur_round_targets) != 1:
-		print(f"Invalid number of targets!! Currently has {cur_round_targets}")
-
-	cur_target = cur_round_targets[0]
+	cur_targets = cur_round_targets
 
 	# NOTIFICATIONS
 
 	notifications = Notifications()
-	notifications.addKills( kills=Kill.objects.filter(target=cur_target) )
+	for target in cur_targets:
+		notifications.addKills( kills=Kill.objects.filter(target=target) )
+		
 	notifications.addIssues( issues = Issue.objects.filter(closed=False), team_code=team_code )
 	notifications.addStatus()
 	
@@ -149,12 +148,11 @@ def home(request, team_code):
 		'cur_round_start': current_round.start_date,
 		'cur_round_end': current_round.end_date,
 
-		'target_team': cur_target.target_team,
 		'team': team,
 
 		'notifications': notifications.get(),
 
-		'cur_target':cur_target,
+		'cur_targets':cur_targets,
 		'rule_suspension': ruleSuspension
 
 	}
@@ -308,25 +306,54 @@ def admin_login_view(request):
 		return HttpResponseRedirect(reverse("assignments:admin-control"))
 
 
+# URL "create-round-post"
 @login_required(login_url="/accounts/login/")
-def createRound(request):
+def createRoundPost(request):
 	if request.method != 'POST':
 		return HttpResponseBadRequest("Must be a POST request!")
 	
-	if "round_num" not in request.POST:
-		return HttpResponseBadRequest("missing round_num param!")
-	if "start_date" not in request.POST:
-		return HttpResponseBadRequest("missing start_date param!")
-	if "end_date" not in request.POST:
-		return HttpResponseBadRequest("missing end_date param!")
+	if "prog_kills" not in request.POST:
+		return HttpResponseBadRequest("missing prog_kills param!")
+	if "rev_kills" not in request.POST:
+		return HttpResponseBadRequest("missing rev_kills param!")
+
+	if "prev_round_id" not in request.POST:
+		return HttpResponseBadRequest("missing prev_round_id param!")
 	
-	roundManager.create_new_round(
-		request.POST["round_num"], 
-		request.POST["start_date"], 
-		request.POST["end_date"]
+	
+	# prevRound = Round.objects.get(request.POST["prev_round_id"])
+	prevRound = get_object_or_404(Round, id=request.POST["prev_round_id"])
+
+	newRound = roundManager.create_new_round(
+		round_num = prevRound.index + 1,
+		start_date = prevRound.end_date.date().isoformat(),
+		end_date = (prevRound.end_date.date() + timezone.timedelta(days=7)).isoformat(),
+
+		prog_kills = request.POST["prog_kills"],
+		rev_kills = request.POST["rev_kills"],
+		direct_pairings = ("direct-pairings" in request.POST)
 	)
 
-	return HttpResponseRedirect(reverse("assignments:admin-control"))
+	template = loader.get_template("assignments/success.html")
+	context = {
+		'message': 	f"Successfully ended round {prevRound.index}, " +
+					f"then successfully created round {newRound.index} with new pairings."
+	}
+	return HttpResponse(template.render(context, request))
+
+
+
+# This is the page that end round directs the user to allow them to select
+@login_required(login_url="/accounts/login/")
+def createRoundPage(request, prev_round_id):
+
+	# prev_round = get_object_or_404(Round, id=prev_round_id)
+	
+	template = loader.get_template("assignments/create_round.html")
+	context = {
+		'prev_round_id': prev_round_id
+	}
+	return HttpResponse(template.render(context, request))
 
 
 # MAIN VIEW
@@ -394,14 +421,11 @@ def eliminateParticipant(request):
 	target_id, elimed_participant_id, eliminator_id, date
 	"""
 	
-	if "target_id" not in request.POST:
-		return HttpResponseBadRequest("missing target ID param!")
 	if "elimed_participant_id" not in request.POST:
 		return HttpResponseBadRequest("missing elimed_participant ID param!")
 	if "eliminator_id" not in request.POST:
 		return HttpResponseBadRequest("missing eliminator ID param!")
 	
-	target = get_object_or_404(Target, id=int(request.POST["target_id"]))
 
 	elimed_participant = get_object_or_404(
 		Participant, id=int(request.POST["elimed_participant_id"])
@@ -411,6 +435,12 @@ def eliminateParticipant(request):
 		Participant, id=int(request.POST["eliminator_id"])
 	)
 	
+	if "target_id" in request.POST:
+		target = get_object_or_404(Target, id=int(request.POST["target_id"]))
+	else:
+		target = get_object_or_404(Target, target_team=elimed_participant.team, prosecuting_team=eliminator.team)
+
+
 	if elimed_participant.round_eliminated or elimed_participant.eliminated_permanently:
 		# template = loader.get_template("assignments/failedToKill.html")
 		template = loader.get_template("assignments/eliminatedParticipant.html")
@@ -502,6 +532,7 @@ def cleanup_round(request):
 	round.completed = True
 	round.save()
 
+	"""
 	roundManager.create_new_round(
 		round_num = round.index + 1,
 		start_date = round.end_date.date().isoformat(),
@@ -514,6 +545,8 @@ def cleanup_round(request):
 					f"then successfully created round {round.index + 1} with new pairings."
 	}
 	return HttpResponse(template.render(context, request))
+	"""
+	return HttpResponseRedirect(reverse("assignments:create-round", args=(round.id,)))
 
 
 def random_date(start_date:datetime.date, end_date:datetime.date):
