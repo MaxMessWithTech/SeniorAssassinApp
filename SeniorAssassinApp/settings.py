@@ -28,7 +28,8 @@ def is_heroku():
     return 'DYNO' in os.environ
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = not is_heroku()
+# DEBUG = not is_heroku()
+DEBUG = False
 
 ALLOWED_HOSTS = ["senior-assassin-9fd1c8975ad5.herokuapp.com", "127.0.0.1"]
 
