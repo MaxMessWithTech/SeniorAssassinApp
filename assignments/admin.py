@@ -19,7 +19,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter = ["id", "name"]
     search_fields = ["id", "name"]
 
-    fields = ["name", "eliminated", "viewing_code"]
+    fields = ["name", "eliminated", "viewing_code", "history"]
     list_display = ["id", "name", "eliminated", "viewing_code"]
 
     actions = [revive_team]
@@ -36,7 +36,7 @@ def perm_elim_participant(modeladmin, request, queryset):
 class ParticipantAdmin(admin.ModelAdmin):
     list_filter = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
     search_fields = ["id", "name"]
-    fields = ["name", "team", "round_eliminated", "eliminated_permanently"]
+    fields = ["name", "team", "round_eliminated", "eliminated_permanently", "history"]
     list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
 
     actions = [revive_participant, perm_elim_participant]
@@ -46,7 +46,7 @@ class ParticipantAdmin(admin.ModelAdmin):
 class RoundAdmin(admin.ModelAdmin):
     list_filter = ["index"]
     search_fields = ["index", "start_date", "end_date"]
-    list_display = ["index", "start_date", "end_date"]
+    list_display = ["index", "start_date", "end_date", "history"]
 
 @admin.register(Target)
 class TargetAdmin(admin.ModelAdmin):
@@ -61,7 +61,7 @@ class KillAdmin(admin.ModelAdmin):
 
     list_display = ["id", "date", "round", "link_to_target", "elimed_participant_name", "eliminator_name", "link"]
 
-    fields = ["elimed_participant", "eliminator", "date", "video_link"]
+    fields = ["elimed_participant", "eliminator", "date", "video_link", "history"]
 
     def get_target(self, obj):
         return obj.target
