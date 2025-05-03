@@ -34,7 +34,7 @@ def revive_participant(modeladmin, request, queryset):
 def perm_elim_participant(modeladmin, request, queryset):
     queryset.update(round_eliminated=True, eliminated_permanently=True)
 
-@admin.register(Participant)
+
 class ParticipantAdmin(SimpleHistoryAdmin):
     list_filter = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
     search_fields = ["id", "name"]
@@ -45,6 +45,8 @@ class ParticipantAdmin(SimpleHistoryAdmin):
     history_list_per_page = 100
 
     actions = [revive_participant, perm_elim_participant]
+
+admin.site.register(Participant, ParticipantAdmin)
 
 
 @admin.register(Round)
