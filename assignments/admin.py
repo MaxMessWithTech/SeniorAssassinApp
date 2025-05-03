@@ -7,6 +7,8 @@ from .models import Team, Participant, Round
 from .models import Target, Kill, RuleSuspension, Issue, Vote
 from .models import ProgressionOverride
 
+from simple_history.admin import SimpleHistoryAdmin
+
 # Cookbook: https://books.agiliq.com/projects/django-admin-cookbook/en/latest/export.html
 
 @admin.action(description="Revive Team")
@@ -15,11 +17,11 @@ def revive_team(modeladmin, request, queryset):
 
 
 @admin.register(Team)
-class TeamAdmin(admin.ModelAdmin):
+class TeamAdmin(SimpleHistoryAdmin):
     list_filter = ["id", "name"]
     search_fields = ["id", "name"]
 
-    fields = ["name", "eliminated", "viewing_code", "history"]
+    fields = ["name", "eliminated", "viewing_code"]
     list_display = ["id", "name", "eliminated", "viewing_code"]
 
     actions = [revive_team]
@@ -33,35 +35,35 @@ def perm_elim_participant(modeladmin, request, queryset):
     queryset.update(round_eliminated=True, eliminated_permanently=True)
 
 @admin.register(Participant)
-class ParticipantAdmin(admin.ModelAdmin):
+class ParticipantAdmin(SimpleHistoryAdmin):
     list_filter = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
     search_fields = ["id", "name"]
-    fields = ["name", "team", "round_eliminated", "eliminated_permanently", "history"]
+    fields = ["name", "team", "round_eliminated", "eliminated_permanently"]
     list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
 
     actions = [revive_participant, perm_elim_participant]
 
 
 @admin.register(Round)
-class RoundAdmin(admin.ModelAdmin):
+class RoundAdmin(SimpleHistoryAdmin):
     list_filter = ["index"]
     search_fields = ["index", "start_date", "end_date"]
-    list_display = ["index", "start_date", "end_date", "history"]
+    list_display = ["index", "start_date", "end_date"]
 
 @admin.register(Target)
-class TargetAdmin(admin.ModelAdmin):
+class TargetAdmin(SimpleHistoryAdmin):
     list_filter = ["round", "target_team", "prosecuting_team"]
     search_fields =  ["round", "eliminations"]
     list_display = ["round", "eliminations", "target_team", "prosecuting_team"]
 
 @admin.register(Kill)
-class KillAdmin(admin.ModelAdmin):
+class KillAdmin(SimpleHistoryAdmin):
     list_filter = ["target__round", "elimed_participant__name", "eliminator__name"]
     search_fields =  ["date", "elimed_participant__name", "eliminator__name"]
 
     list_display = ["id", "date", "round", "link_to_target", "elimed_participant_name", "eliminator_name", "link"]
 
-    fields = ["elimed_participant", "eliminator", "date", "video_link", "history"]
+    fields = ["elimed_participant", "eliminator", "date", "video_link"]
 
     def get_target(self, obj):
         return obj.target
@@ -138,7 +140,7 @@ class KillAdmin(admin.ModelAdmin):
 
 
 @admin.register(RuleSuspension)
-class RuleSuspensionAdmin(admin.ModelAdmin):
+class RuleSuspensionAdmin(SimpleHistoryAdmin):
     list_filter = []
     search_fields =  []
 
