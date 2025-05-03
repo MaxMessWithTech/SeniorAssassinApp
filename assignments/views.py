@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, JsonResponse
 from django.template import loader
 from django.urls import reverse
 from django.utils import timezone
@@ -678,5 +678,5 @@ def revertThingsFromToday(request):
 	# 	change.history.prev_record()
 	# 	change.instance.save()
 
-	return recent_changes
+	return JsonResponse(recent_changes)
 
