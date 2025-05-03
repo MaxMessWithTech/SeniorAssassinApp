@@ -41,6 +41,9 @@ class ParticipantAdmin(SimpleHistoryAdmin):
     fields = ["name", "team", "round_eliminated", "eliminated_permanently"]
     list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
 
+    history_list_display = ["round_eliminated", "eliminated_permanently"]
+    history_list_per_page = 5
+
     actions = [revive_participant, perm_elim_participant]
 
 
