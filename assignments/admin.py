@@ -22,7 +22,7 @@ class TeamAdmin(SimpleHistoryAdmin):
     search_fields = ["id", "name"]
 
     fields = ["name", "eliminated", "viewing_code"]
-    list_display = ["id", "name", "eliminated", "viewing_code"]
+    list_display = ["id", "name", "eliminated", "viewing_code", "eliminated_date"]
 
     actions = [revive_team]
 
