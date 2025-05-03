@@ -29,7 +29,7 @@ def is_heroku():
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = not is_heroku()
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["senior-assassin-9fd1c8975ad5.herokuapp.com", "127.0.0.1"]
 

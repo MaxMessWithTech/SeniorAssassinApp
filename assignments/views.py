@@ -669,3 +669,11 @@ def addThings(request):
 
 	print("Added all data from the CSV")
 	return HttpResponse("Added all data from the CSV")
+
+
+def revertThingsFromToday(request):
+	recent_changes = Participant.history.as_of(datetime.datetime.today())
+
+	for change in recent_changes:
+		change.prev_record()
+		change.instance.save()
