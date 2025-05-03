@@ -39,13 +39,13 @@ class ParticipantAdmin(SimpleHistoryAdmin):
     list_filter = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
     search_fields = ["id", "name"]
     fields = ["name", "team", "round_eliminated", "eliminated_permanently"]
-    list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently", "history_object"]
+    list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
     
     actions = [revive_participant, perm_elim_participant]
 
 @admin.register(Participant.history.model)
 class ParticipantHistoryAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently", "history_object"]
+    list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently", "history_round_eliminated", "history_eliminated_permanently"]
     
     actions = [revive_participant, perm_elim_participant]
 
