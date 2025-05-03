@@ -35,10 +35,16 @@ def perm_elim_participant(modeladmin, request, queryset):
     queryset.update(round_eliminated=True, eliminated_permanently=True)
 
 @admin.register(Participant)
-class ParticipantAdmin(admin.ModelAdmin):
+class ParticipantAdmin(SimpleHistoryAdmin):
     list_filter = ["id", "name", "team", "round_eliminated", "eliminated_permanently"]
     search_fields = ["id", "name"]
     fields = ["name", "team", "round_eliminated", "eliminated_permanently"]
+    list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently", "history_object"]
+    
+    actions = [revive_participant, perm_elim_participant]
+
+@admin.register(Participant.history.model)
+class ParticipantHistoryAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently", "history_object"]
     
     actions = [revive_participant, perm_elim_participant]
