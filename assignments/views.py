@@ -674,6 +674,9 @@ def addThings(request):
 def revertThingsFromToday(request):
 	recent_changes = Participant.history.as_of(datetime.datetime.today())
 
-	for change in recent_changes:
-		change.history.prev_record()
-		change.instance.save()
+	# for change in recent_changes:
+	# 	change.history.prev_record()
+	# 	change.instance.save()
+
+	return recent_changes
+
