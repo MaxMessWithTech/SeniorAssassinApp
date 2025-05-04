@@ -683,6 +683,8 @@ def revertThingsFromToday(request):
 
 def checkTeamElimed(targets, round) -> bool: 
 	# targets = Target.objects.filter(round=round, prosecuting_team=participant.team)
+	if not round.completed:
+		return False
 
 	numKills = 0
 	for target in targets:
@@ -727,7 +729,7 @@ def confirmGameStatusIsAccurate(request):
 			# print(f"{participant.name} -> F")
 			for round in Round.objects.all():
 				targets = Target.objects.filter(round=round, prosecuting_team=participant.team)
-				if checkTeamElimed(targets,round):
+				if checkTeamElimed(targets, round):
 					out[participant.id] = {"name": participant.name, "eliminated": True, "how": "1"}
 					break
 			else:
