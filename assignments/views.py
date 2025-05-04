@@ -691,7 +691,7 @@ def confirmParticipantElimed(kills, participant) -> bool:
 
 		numKills = 0
 		for target in targets:
-			numKills += len(target.kills)
+			numKills += len(target.kills.all())
 
 		if numKills < round.min_revive_kill_count:
 			return True
