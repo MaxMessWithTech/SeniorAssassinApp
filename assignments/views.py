@@ -742,6 +742,10 @@ def confirmGameStatusIsAccurate(request):
 		else:
 			out[participant.id] = {"name": participant.name, "eliminated": False}
 
+	for participant in Participant.objects.all():
+		team = participant.team
+		if team.eliminated:
+			out[participant.id] = {"name": participant.name, "eliminated": True}
 	
 	for participant in Participant.objects.all():
 		data = out[participant.id]
