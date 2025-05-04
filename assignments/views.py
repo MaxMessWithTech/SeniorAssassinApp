@@ -728,24 +728,24 @@ def confirmGameStatusIsAccurate(request):
 			for round in Round.objects.all():
 				targets = Target.objects.filter(round=round, prosecuting_team=participant.team)
 				if checkTeamElimed(targets,round):
-					out[participant.id] = {"name": participant.name, "eliminated": True}
+					out[participant.id] = {"name": participant.name, "eliminated": True, "how": "1"}
 					break
 			else:
-				out[participant.id] = {"name": participant.name, "eliminated": False}
+				out[participant.id] = {"name": participant.name, "eliminated": False, "how": "2"}
 
 			continue
 
 		elif confirmParticipantElimed(kills, participant):
 			# print(f"{participant.name} -> T")
-			out[participant.id] = {"name": participant.name, "eliminated": True}
+			out[participant.id] = {"name": participant.name, "eliminated": True, "how": "3"}
 
 		else:
-			out[participant.id] = {"name": participant.name, "eliminated": False}
+			out[participant.id] = {"name": participant.name, "eliminated": False, "how": "4"}
 
 	for participant in Participant.objects.all():
 		team = participant.team
 		if team.eliminated:
-			out[participant.id] = {"name": participant.name, "eliminated": True}
+			out[participant.id] = {"name": participant.name, "eliminated": True, "how": "5"}
 	
 	for participant in Participant.objects.all():
 		data = out[participant.id]
