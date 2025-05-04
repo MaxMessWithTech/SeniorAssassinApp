@@ -681,13 +681,26 @@ def revertThingsFromToday(request):
 	return JsonResponse(recent_changes)
 """
 
+def checkTeamElimed(team, round) -> bool: 
+	targets = Target.objects.filter(round=round)
+
+	numKills = 0
+	for target in targets:
+		numKills += len(target.kills.all())
+
+	if numKills < round.min_progression_kill_count:
+		return True
+	
+	return False
+
 
 def confirmParticipantElimed(kills, participant) -> bool:
+	# Loop through every kill on a particular participant
 	for kill in kills:
 		# For each kill see if they would have been revived
 		round = kill.target.round
 
-		targets = Target.objects.filter(round=round)
+		targets = Target.objects.filter(round=round, prosecuting_team=participant.team)
 
 		numKills = 0
 		for target in targets:
@@ -696,7 +709,10 @@ def confirmParticipantElimed(kills, participant) -> bool:
 		if numKills < round.min_revive_kill_count:
 			return True
 		
-		return False
+		if checkTeamElimed(participant.team):
+			return True
+
+	return False
 
 
 def confirmGameStatusIsAccurate(request):
@@ -710,14 +726,16 @@ def confirmGameStatusIsAccurate(request):
 		if len(kills) == 0:
 			# print(f"{participant.name} -> F")
 			out[participant.id] = {"name": participant.name, "eliminated": "F"}
+
 			continue
 
-		if confirmParticipantElimed(kills, participant):
+		elif confirmParticipantElimed(kills, participant):
 			# print(f"{participant.name} -> T")
-			out[participant.id] = {"name": participant.name, "eliminated": "F"}
-		else:
-			# print(f"{participant.name} -> F")
 			out[participant.id] = {"name": participant.name, "eliminated": "T"}
+
+		else:
+			out[participant.id] = {"name": participant.name, "eliminated": "F"}
+	
 
 	return JsonResponse(out)
 
