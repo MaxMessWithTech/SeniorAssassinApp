@@ -670,7 +670,7 @@ def addThings(request):
 	print("Added all data from the CSV")
 	return HttpResponse("Added all data from the CSV")
 
-
+"""
 def revertThingsFromToday(request):
 	recent_changes = Participant.history.as_of(datetime.datetime.today())
 
@@ -679,4 +679,43 @@ def revertThingsFromToday(request):
 	# 	change.instance.save()
 
 	return JsonResponse(recent_changes)
+"""
+
+
+def confirmParticipantElimed(kills, participant) -> bool:
+	for kill in kills:
+		# For each kill see if they would have been revived
+		round = kill.target.round
+
+		targets = Target.objects.filter(round=round)
+
+		numKills = 0
+		for target in targets:
+			numKills += len(target.kills)
+
+		if numKills < round.min_revive_kill_count:
+			return True
+		
+		return False
+
+
+def confirmGameStatusIsAccurate(request):
+	out = {}
+	
+	participants = Participant.objects.all()
+
+	for participant in participants:
+		kills = Kill.objects.query(elimed_participant = participant)
+
+		if len(kills) == 0:
+			# print(f"{participant.name} -> F")
+			out[participant.id] = {"name": participant.name, "eliminated": "F"}
+			continue
+
+		if confirmParticipantElimed(kills, participant):
+			# print(f"{participant.name} -> T")
+			out[participant.id] = {"name": participant.name, "eliminated": "F"}
+		else:
+			# print(f"{participant.name} -> F")
+			out[participant.id] = {"name": participant.name, "eliminated": "T"}
 
