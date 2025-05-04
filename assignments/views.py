@@ -705,7 +705,7 @@ def confirmGameStatusIsAccurate(request):
 	participants = Participant.objects.all()
 
 	for participant in participants:
-		kills = Kill.objects.query(elimed_participant = participant)
+		kills = Kill.objects.filter(elimed_participant = participant)
 
 		if len(kills) == 0:
 			# print(f"{participant.name} -> F")
