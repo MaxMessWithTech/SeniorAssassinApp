@@ -717,6 +717,7 @@ def confirmParticipantElimed(kills, participant) -> bool:
 	return False
 
 
+@login_required(login_url="/accounts/login/")
 def confirmGameStatusIsAccurate(request):
 	out = {}
 	
@@ -757,3 +758,10 @@ def confirmGameStatusIsAccurate(request):
 
 	return JsonResponse(out)
 
+
+@login_required(login_url="/accounts/login/")
+def createAllPairings(request):
+	round = getCurRound()
+	roundManager.make_all_pairings(round)
+
+	return HttpResponseRedirect(reverse("assignments:admin-control"))

@@ -25,7 +25,9 @@ urlpatterns = [
 
     path("accounts/login/", views.admin_login_view, name="admin-login"),
 
-    path("confirm-status/", views.confirmGameStatusIsAccurate, name="confirm-status")
+    path("confirm-status/", views.confirmGameStatusIsAccurate, name="confirm-status"),
+
+    path("create-pairings/", views.createAllPairings, name="create-pairings")
 ]
 
 def custom_404(request, exception):
