@@ -743,7 +743,7 @@ def confirmGameStatusIsAccurate(request):
 			out[participant.id] = {"name": participant.name, "eliminated": False}
 
 	
-	for participant in Participant:
+	for participant in Participant.objects.all():
 		data = out[participant.id]
 		if data["eliminated"] == participant.eliminated_permanently:
 			out.pop(participant.id)
