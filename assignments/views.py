@@ -725,7 +725,13 @@ def confirmGameStatusIsAccurate(request):
 
 		if len(kills) == 0:
 			# print(f"{participant.name} -> F")
-			out[participant.id] = {"name": participant.name, "eliminated": "F"}
+			for round in Round.objects.all():
+				targets = Target.objects.filter(round=round, prosecuting_team=participant.team)
+				if checkTeamElimed(targets,round):
+					out[participant.id] = {"name": participant.name, "eliminated": "T"}
+					break
+			else:
+				out[participant.id] = {"name": participant.name, "eliminated": "F"}
 
 			continue
 
