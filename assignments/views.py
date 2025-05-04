@@ -681,8 +681,8 @@ def revertThingsFromToday(request):
 	return JsonResponse(recent_changes)
 """
 
-def checkTeamElimed(team, round) -> bool: 
-	targets = Target.objects.filter(round=round)
+def checkTeamElimed(targets, round) -> bool: 
+	# targets = Target.objects.filter(round=round, prosecuting_team=participant.team)
 
 	numKills = 0
 	for target in targets:
@@ -709,7 +709,7 @@ def confirmParticipantElimed(kills, participant) -> bool:
 		if numKills < round.min_revive_kill_count:
 			return True
 		
-		if checkTeamElimed(participant.team,round):
+		if checkTeamElimed(targets,round):
 			return True
 
 	return False
