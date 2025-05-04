@@ -709,7 +709,7 @@ def confirmParticipantElimed(kills, participant) -> bool:
 		if numKills < round.min_revive_kill_count:
 			return True
 		
-		if checkTeamElimed(participant.team):
+		if checkTeamElimed(participant.team,round):
 			return True
 
 	return False
