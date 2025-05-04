@@ -728,19 +728,25 @@ def confirmGameStatusIsAccurate(request):
 			for round in Round.objects.all():
 				targets = Target.objects.filter(round=round, prosecuting_team=participant.team)
 				if checkTeamElimed(targets,round):
-					out[participant.id] = {"name": participant.name, "eliminated": "T"}
+					out[participant.id] = {"name": participant.name, "eliminated": True}
 					break
 			else:
-				out[participant.id] = {"name": participant.name, "eliminated": "F"}
+				out[participant.id] = {"name": participant.name, "eliminated": False}
 
 			continue
 
 		elif confirmParticipantElimed(kills, participant):
 			# print(f"{participant.name} -> T")
-			out[participant.id] = {"name": participant.name, "eliminated": "T"}
+			out[participant.id] = {"name": participant.name, "eliminated": True}
 
 		else:
-			out[participant.id] = {"name": participant.name, "eliminated": "F"}
+			out[participant.id] = {"name": participant.name, "eliminated": False}
+
+	
+	for participant in Participant:
+		data = out[participant.id]
+		if data["eliminated"] == participant.eliminated_permanently:
+			out.pop(participant.id)
 	
 
 	return JsonResponse(out)
