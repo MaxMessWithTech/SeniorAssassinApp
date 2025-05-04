@@ -719,3 +719,5 @@ def confirmGameStatusIsAccurate(request):
 			# print(f"{participant.name} -> F")
 			out[participant.id] = {"name": participant.name, "eliminated": "T"}
 
+	return JsonResponse(out)
+
