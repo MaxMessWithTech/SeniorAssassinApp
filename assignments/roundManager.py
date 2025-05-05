@@ -40,9 +40,12 @@ def make_all_pairings(round:Round):
 
 	for pro_team in teams:
 		for tar_team in teams:
+			if pro_team == tar_team:
+				continue
+
 			if Target.objects.filter(round=round, target_team=tar_team, prosecuting_team=pro_team).first() is not None:
 				continue
-			
+
 			target = Target(
 				round=round, 
 				target_team=tar_team, 
