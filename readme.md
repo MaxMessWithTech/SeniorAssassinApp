@@ -1,4 +1,5 @@
 ## How to Start
+```
 python3 -m venv venv
 source venv/bin/activate (Mac)
 venv\Scripts\activate (Windows)
@@ -6,6 +7,7 @@ pip3 install -r requirements.txt
 python3 manage.py makemigrations
 python3 manage.py migrate
 python3 manage.py runserver
+```
 
 
 ## To start over:
