@@ -46,11 +46,23 @@ class ParticipantAdmin(SimpleHistoryAdmin):
     
     actions = [revive_participant, perm_elim_participant]
 
+
 @admin.register(Participant.history.model)
 class ParticipantHistoryAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "team", "round_eliminated", "eliminated_permanently", "history_round_eliminated", "history_eliminated_permanently"]
-    
+    list_display = [
+        "id", "name", "team", "round_eliminated", "eliminated_permanently",
+        "history_round_eliminated", "history_eliminated_permanently"
+    ]
     actions = [revive_participant, perm_elim_participant]
+
+    def history_round_eliminated(self, obj):
+        return obj.round_eliminated
+    history_round_eliminated.short_description = "Round Eliminated"
+
+    def history_eliminated_permanently(self, obj):
+        return obj.eliminated_permanently
+    history_eliminated_permanently.short_description = "Eliminated Permanently"
+
 
 
 @admin.register(Round)

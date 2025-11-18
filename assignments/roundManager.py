@@ -101,7 +101,7 @@ def make_multi_pairings(round:Round, depth:int):
 
 	pair_depth = list()
 
-	for i in depth:
+	for i in range(depth):
 		pair_depth.append(make_layer_pairing(round, teams))
 
 
