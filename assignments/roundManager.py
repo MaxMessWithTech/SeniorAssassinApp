@@ -130,6 +130,7 @@ def create_new_round(
 	
 	# Make random assignments
 	if direct_pairings:
+		print("Making direct pairings")
 		make_direct_pairings(round=round)
 	else:
 		make_all_pairings(round=round)

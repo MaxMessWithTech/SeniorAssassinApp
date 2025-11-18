@@ -324,6 +324,8 @@ def createRoundPost(request):
 	# prevRound = Round.objects.get(request.POST["prev_round_id"])
 	prevRound = get_object_or_404(Round, id=request.POST["prev_round_id"])
 
+	print(request.POST, "direct-pairings" in request.POST)
+
 	newRound = roundManager.create_new_round(
 		round_num = prevRound.index + 1,
 		start_date = prevRound.end_date.date().isoformat(),
