@@ -18,7 +18,7 @@ python3 manage.py createsuperuser
 python3 manage.py runserver
 ```
 
-Update the "SeniorAssassinTeams.csv" file with correct team ids, names, and members
-Navigate to "http://127.0.0.1:8000/add-things"
-Navigate to "http://127.0.0.1:8000/admin/assignments/round/add/", and create your first round
-Navigate to "http://127.0.0.1:8000/create-pairings/"
+Update the "SeniorAssassinTeams.csv" file with correct team ids, names, and members\
+Navigate to "http://127.0.0.1:8000/add-things"\
+Navigate to "http://127.0.0.1:8000/admin/assignments/round/add/", and create your first round\
+Navigate to "http://127.0.0.1:8000/create-pairings/"\
